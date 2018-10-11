@@ -14,7 +14,7 @@ int i=0;
 
 void setup(){
 
-  Serial.begin(9600);
+  Serial.begin(230400);
 }
 
 
@@ -27,7 +27,7 @@ void loop(){
   
   Serial.println(v1);
 
-  if(i>=50){
+  if(i>=1000){
     led_value +=50;
     Serial.println("Step");
     i=0;   
@@ -38,5 +38,5 @@ void loop(){
   analogWrite(ledPin, led_value);
 
   i++;
-  delay(100);
+  delay(5);
 }
