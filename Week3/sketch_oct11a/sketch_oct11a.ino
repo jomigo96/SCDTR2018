@@ -24,8 +24,10 @@ void loop(){
   sensorValue1 = analogRead(sensorPin1);
   
   v1 = sensorValue1*5.0/1.0230;
+
+  sprintf(str,"%d - %ld - %d", v1, micros(), led_value);
+  Serial.println(str);
   
-  Serial.println(v1);
 
   if(i>=1000){
     led_value +=50;
