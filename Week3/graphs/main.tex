@@ -1,0 +1,18 @@
+\RequirePackage[l2tabu, orthodox]{nag}
+\documentclass{standalone}
+
+\usepackage{standalone}
+\input{preamble}
+
+\begin{document}
+
+% Os plots precisam de ser corrigidos para terem a mesma grandeza, i.e. para serem mais comparaveis. O segundo plot (azul) ja tem um fator de multiplicacao, quem tiver as contas feitas esteja a vontade pa mexer com isso.
+% Estes plots tambem foram despachados assim rapidinho, nao ha muitos pormenores, portanto e provavel que haja erros. Eu depois corrijo.
+\begin{tikzpicture}
+	\begin{axis}[xlabel = {Tempo (\si{\micro\second})}, ylabel = {Tensão (\si{\milli\volt})}, grid = both,]
+		\addplot [red] table [col sep = comma, x index = 1, y index = 0, mark = none] {data4.csv};
+		\addplot [blue, y filter/.code={\pgfmathparse{#1 * 15}\pgfmathresult}] table [col sep = comma, x index = 1, y index = 2, mark = none]{data4.csv};
+	\end{axis}
+\end{tikzpicture}
+
+\end{document}
