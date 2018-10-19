@@ -1,0 +1,77 @@
+% ------------------------------ 76 characters -----------------------------
+\usepackage[l2tabu, orthodox]{nag}
+
+% -- Texto e codificação
+\usepackage[utf8]{inputenc}
+\usepackage[portuguese]{babel}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{anyfontsize}
+\usepackage{pdflscape}
+
+% -- Tipo de letra
+\usepackage{heuristica}
+\usepackage[heuristica,vvarbb,bigdelims]{newtxmath}
+\usepackage[T1]{fontenc}
+\renewcommand*\oldstylenums[1]{\textosf{#1}}
+
+%\usepackage{lmodern}
+%\usepackage[T1]{fontenc}
+
+% -- Definir margens do documento
+\usepackage{geometry}
+\geometry{verbose, nomarginpar,
+    tmargin = 2.5cm,
+    bmargin = 2.5cm,
+    lmargin = 2.5cm,
+    rmargin = 2.5cm}
+%\usepackage{showframe}
+
+% -- Cabeçalho e rodapé
+\usepackage{fancyhdr}
+\fancyhf{}
+\fancyhead[L]{\textsc{}}
+\fancyhead[R]{\textsc{}}
+\fancyfoot[C]{\thepage}
+\pagestyle{fancy}
+
+% -- Funções matemáticas extra
+\usepackage{mathtools}
+\usepackage{siunitx}
+
+% -- Símbolos extra
+\usepackage{amssymb}
+\usepackage{textcomp}
+\usepackage{gensymb}
+\usepackage{cancel}
+
+% -- Referências
+\usepackage{hyperref}
+
+% -- Bibliografia
+\usepackage[
+backend=biber,
+style=alphabetic,
+sorting=ynt
+]{biblatex}
+\usepackage{fvextra}
+\usepackage{csquotes}
+
+% --  Definições de imagens
+\usepackage{graphicx}
+\graphicspath{{graphics/}}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{afterpage}
+\usepackage{tabularx}
+
+% -- Desenhar circuitos elétricos e lógicos
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usetikzlibrary{arrows.meta,positioning}
+\pgfplotsset{compat=1.5}
+\pgfplotsset{table/search path = {data}}
+\pgfplotsset{	/pgf/number format/use comma,}
+
+% -- Integrar código fonte
+\usepackage{minted}
