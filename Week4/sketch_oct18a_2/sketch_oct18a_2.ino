@@ -22,8 +22,13 @@ volatile byte flag=0;
 const int pin_switch=2;
 
 // Control
-float target=high;
-
+volatile float target=80;
+float integral = 0;
+float error = 0;
+float error_keep = 0;
+const float KP = 1.5;
+const float KI = 0.01;
+const float h = 0.005;
 
 // Interupt service routine
 ISR(TIMER1_COMPA_vect){
@@ -75,13 +80,26 @@ void loop() {
   if(flag){
 
     //Feed-forward
-    value = target / 0.02926147;
+    value = 0;//target / 0.02926147;
+
+    //Simulator
+    //¯\_(ツ)_/¯
 
     //Feed-back
-    //¯\_(ツ)_/¯
+    error = L-target;
+    integral = integral + h/2.0*(error + error_keep);
+    value += integral*KI + error*KP;
     
+    //Control output
     analogWrite(ledPin, value);
+
+    //Anti windup, stop integrating
+    if((value > 255) || (value < 0)){
+      integral -= h/2.0*(error + error_keep);  
+    }
+    
     flag=0;
+    error_keep = error;
   }
   
   
