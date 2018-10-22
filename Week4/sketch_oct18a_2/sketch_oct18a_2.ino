@@ -7,8 +7,8 @@ int sensor_value;
 float v;
 float R;
 float L;
-const float b = 5.8515;
-const float m = -0.9355;
+const float b = 5.3060;
+const float m = -0.7724;
 const float Raux = 10000;
 
 // LED related
