@@ -10,32 +10,31 @@ float L;
 const float b = 5.3060;
 const float m = -0.7724;
 const float Raux = 10000;
+const float high = 80;
+const float low = 40;
 
 // LED related
 const int ledPin = 3;
-
-// I/O
 int value = 50;
-int i;
-char buffer[10];
 
 // Interupts
 volatile byte flag=0;
 const int pin_switch=2;
-volatile byte presence=1; //Simulates presence sensor 
+
+// Control
+float target=high;
 
 
 // Interupt service routine
-
 ISR(TIMER1_COMPA_vect){
 
-  // Check interrupt?
   flag=1;  
 }
 
 void switch_isr(){
 
-  presence = !presence;
+  // Switch simulates a presence sensor, ie, toggles the target LUX
+  target = (target == high) ? low : high;
 }
 
 void setup() {
@@ -64,21 +63,6 @@ void setup() {
 
 void loop() {
 
-
-  // Read from Serial target LUX value
-  i=0;
-  while(Serial.available()){
-    buffer[i]=Serial.read(); 
-    i++;
-    delay(5);
-  }
-  if(i>0){
-    buffer[i]=0;
-    value = atoi(buffer);  
-    value = (value>255) ? 255 : value;
-    value = (value<0) ? 0 : value;
-  }
-
   // Compute luminosity
   sensor_value = analogRead(sensor_pin);
   v = sensor_value*5.0/1.0230;
@@ -90,10 +74,13 @@ void loop() {
   // Control
   if(flag){
 
+    //Feed-forward
+    value = target / 0.02926147;
 
-
+    //Feed-back
+    //¯\_(ツ)_/¯
     
-    analogWrite(ledPin, presence*value);
+    analogWrite(ledPin, value);
     flag=0;
   }
   
