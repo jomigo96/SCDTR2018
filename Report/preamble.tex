@@ -1,8 +1,6 @@
-% ------------------------------ 76 characters -----------------------------
-\usepackage[l2tabu, orthodox]{nag}
-
 % -- Texto e codificação
 \usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
 \usepackage[portuguese]{babel}
 \usepackage{microtype}
 \usepackage{xcolor}
@@ -10,17 +8,16 @@
 \usepackage{pdflscape}
 
 % -- Tipo de letra
-\usepackage{heuristica}
-\usepackage[heuristica,vvarbb,bigdelims]{newtxmath}
-\usepackage[T1]{fontenc}
-\renewcommand*\oldstylenums[1]{\textosf{#1}}
+\usepackage{newpxtext}
+\usepackage{eulervm}
+\usepackage{nimbusmono}
 
 %\usepackage{lmodern}
 %\usepackage[T1]{fontenc}
 
 % -- Definir margens do documento
 \usepackage{geometry}
-\geometry{verbose, nomarginpar,
+\geometry{nomarginpar,
     tmargin = 2.5cm,
     bmargin = 2.5cm,
     lmargin = 2.5cm,
@@ -34,6 +31,8 @@
 \fancyhead[R]{\textsc{}}
 \fancyfoot[C]{\thepage}
 \pagestyle{fancy}
+\renewcommand\headrulewidth{0.2pt}
+\renewcommand\footrulewidth{0pt}
 
 % -- Funções matemáticas extra
 \usepackage{mathtools}
@@ -47,13 +46,17 @@
 
 % -- Referências
 \usepackage{hyperref}
+\hypersetup{colorlinks,
+	linkcolor	= {red!50!black},
+	citecolor	= {green!30!black},
+	urlcolor	= {blue!80!black}}
 
 % -- Bibliografia
 \usepackage[
-backend=biber,
-style=alphabetic,
-sorting=ynt
-]{biblatex}
+	backend = biber,
+	style = alphabetic,
+	sorting = ynt
+	]{biblatex}
 \usepackage{fvextra}
 \usepackage{csquotes}
 
