@@ -26,9 +26,12 @@ volatile float target=80;
 float integral = 0;
 float error = 0;
 float error_keep = 0;
-const float KP = 1.5;
-const float KI = 0.01;
-const float h = 0.005;
+float u = 0;
+float ff = 0;
+const float KP = 0.01;
+const float KI = 0.00001;
+const float h = 0.0005;
+const float epsilon = 0.7;
 
 // Interupt service routine
 ISR(TIMER1_COMPA_vect){
@@ -42,6 +45,27 @@ void switch_isr(){
   target = (target == high) ? low : high;
 }
 
+inline float deadzone(float error, float epsilon){
+  
+  if(error > epsilon){
+    return error-epsilon;  
+  }else if(error < epsilon){
+    return error+epsilon;
+  }else
+    return 0;
+}
+
+inline int saturation(int value){
+  
+  if(value > 255){
+    return 255;
+  }else if(value < 0){
+    return 0;
+  }else
+    return value;
+  
+}
+
 void setup() {
 
   
@@ -52,10 +76,10 @@ void setup() {
   TCNT1 = 0; // Reset timer count
   
   // Timer limits on this count
-  OCR1A = 5*16-1; // 5*16*62.5ns = 5000 ns
+  OCR1A = 1000-1; // 1000*500ns = 500 micro.s
 
   TCCR1B |= (1<<WGM12);
-  TCCR1B |= (1<<CS10)|(0<<CS12)|(0<CS11); // prescaler 1
+  TCCR1B |= (0<<CS12)|(1<<CS11)|(0<<CS10); // prescaler 8
   TIMSK1 |= (1<<OCIE1A); 
 
   // Contact switch
@@ -68,34 +92,42 @@ void setup() {
 
 void loop() {
 
-  // Compute luminosity
-  sensor_value = analogRead(sensor_pin);
-  v = sensor_value*5.0/1.0230;
-  R = (5-v/1000.0)/(v/1000.0/Raux);
-  L = pow(10, (log10(R)-b)/m );
-  Serial.println(L);
-
-
   // Control
   if(flag){
 
+    // Compute luminosity
+    sensor_value = analogRead(sensor_pin);
+    v = sensor_value*5.0/1.0230;
+    R = (5-v/1000.0)/(v/1000.0/Raux);
+    L = pow(10, (log10(R)-b)/m );
+    Serial.println(L);
+
     //Feed-forward
-    value = 0;//target / 0.02926147;
+    ff = target * 0.5228758;
 
     //Simulator
     //¯\_(ツ)_/¯
 
     //Feed-back
-    error = L-target;
+    error = deadzone(target - L, epsilon);
     integral = integral + h/2.0*(error + error_keep);
-    value += integral*KI + error*KP;
+    u += (integral*KI + error)*KP;
+    value = ff + round(u);
+
+    //Serial.println(u);
     
     //Control output
-    analogWrite(ledPin, value);
-
+    analogWrite(ledPin, saturation(value));
+    
+    //Serial.println(saturation(value));
+    
     //Anti windup, stop integrating
-    if((value > 255) || (value < 0)){
-      integral -= h/2.0*(error + error_keep);  
+    if(value > 255){
+      u = 255 - ff;
+      integral = integral - h/2.0*(error+error_keep);  
+    }else if(value<0){
+      u = -ff;     
+      integral = integral - h/2.0*(error+error_keep); 
     }
     
     flag=0;
