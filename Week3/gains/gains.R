@@ -51,7 +51,7 @@ tau5 <- set5[z, "time"] - set5[1, "time"]
 out <- data.frame(
 				  c(0 , 50, 100, 150, 200),
 				  c(avg1, avg2, avg3, avg4, avg5),
-				  c(NA, avg2/avg1, avg3/avg2, avg4/avg3, avg5/avg4),
+				  c(NA, avg2/50, avg3/100, avg4/150, avg5/200),
 				  c(NA, tau2, tau3, tau4, tau5))
 names(out) <- c("led", "final-value","gain-i","tau-i")
 
@@ -59,7 +59,7 @@ print(out)
 
 
 # first gain is unusable since the initial value is close to 0
-gain <- mean(out[3:5, "gain-i"])/50
+gain <- mean(out[3:5, "gain-i"])
 print("Gain: [lux] / [led_power]")
 print(gain)
 

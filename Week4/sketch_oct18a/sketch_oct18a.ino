@@ -100,7 +100,6 @@ void loop() {
     v = sensor_value*5.0/1.0230;
     R = (5-v/1000.0)/(v/1000.0/Raux);
     L = pow(10, (log10(R)-b)/m );
-    Serial.println(L);
 
     //Feed-forward
     ff = target * 0.5228758;
@@ -129,7 +128,8 @@ void loop() {
       u = -ff;     
       integral = integral - h/2.0*(error+error_keep); 
     }
-    
+
+    Serial.println(L);
     flag=0;
     error_keep = error;
   }
