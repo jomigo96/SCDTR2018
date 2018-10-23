@@ -10,6 +10,7 @@ float L;
 const float b = 5.3060;
 const float m = -0.7724;
 const float Raux = 10000;
+const float C = 1e-6;
 const float high = 80;
 const float low = 40;
 
@@ -23,6 +24,9 @@ const int pin_switch=2;
 
 // Control
 volatile float target=80;
+volatile float prev=40;
+volatile float t=0;
+float Ltarget;
 float integral = 0;
 float error = 0;
 float error_keep = 0;
@@ -42,7 +46,14 @@ ISR(TIMER1_COMPA_vect){
 void switch_isr(){
 
   // Switch simulates a presence sensor, ie, toggles the target LUX
-  target = (target == high) ? low : high;
+  if(target == high){
+    target = low;
+    prev = high;  
+  }else{
+    target = high;
+    prev = low;  
+  }
+  t=0;
 }
 
 inline float deadzone(float error, float epsilon){
@@ -56,15 +67,19 @@ inline float deadzone(float error, float epsilon){
 }
 
 inline int saturation(int value){
+
+  int out;
   
   if(value > 255){
-    return 255;
+    out = 255;
   }else if(value < 0){
-    return 0;
+    out = 0;
   }else
-    return value;
-  
+    out = value;
+  return out;
 }
+
+float simulation(){}
 
 void setup() {
 
@@ -100,16 +115,16 @@ void loop() {
     v = sensor_value*5.0/1.0230;
     R = (5-v/1000.0)/(v/1000.0/Raux);
     L = pow(10, (log10(R)-b)/m );
-    Serial.println(L);
 
     //Feed-forward
     ff = target * 0.5228758;
 
     //Simulator
     //¯\_(ツ)_/¯
+    Ltarget = target - (target - prev)*exp(-t/((R+Raux)*C));
 
     //Feed-back
-    error = deadzone(target - L, epsilon);
+    error = deadzone(Ltarget - L, epsilon);
     integral = integral + h/2.0*(error + error_keep);
     u += (integral*KI + error)*KP;
     value = ff + round(u);
@@ -120,6 +135,10 @@ void loop() {
     analogWrite(ledPin, saturation(value));
     
     //Serial.println(saturation(value));
+    //Serial.println(Ltarget);
+    Serial.println(L);
+    
+    t += h;
     
     //Anti windup, stop integrating
     if(value > 255){
