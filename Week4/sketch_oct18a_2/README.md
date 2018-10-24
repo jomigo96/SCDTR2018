@@ -1,5 +1,3 @@
 # Modulo de controlo feed-forward + feedback
 
-Implementar interrupções com o Timer1 - work in progress
-
-Para o LDR2
+Para o LDR2, aquele que é mesmo do lab. O outro partiu-se.

@@ -126,8 +126,13 @@ void setup() {
 
 void loop() {
 
+	long m1, m2;
+
   // Control
   if(flag){
+
+	m1 = micros();
+
     // Compute luminosity
     s1 = analogRead(sensor_pin);
     s2 = analogRead(sensor_pin);
@@ -151,12 +156,15 @@ void loop() {
     //Control output
     analogWrite(ledPin, saturation(value));
 
+	m2 = micros();
+
     // Display values
     //Serial.println(saturation(value));
     //Serial.println(Ltarget);
     //Serial.println(u);
     //Serial.println(sensor_value);
-    Serial.println(L);
+    //Serial.println(L);
+	Serial.println(m2-m1);
 
     // Cleaning-up
     t += h;
