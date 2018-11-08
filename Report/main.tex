@@ -7,12 +7,26 @@
 
 \begin{document}
 
-\newpage
-\tableofcontents
-\newpage
+{\hypersetup{linkcolor = black} \tableofcontents}
+\pagebreak
 
 \section{Introdução}
 
+\section{Raspbian Startup}
+
+\begin{enumerate}
+	\item Open console
+	\item \texttt{sudo ifconfig enp2s0f0 10.0.0.2 netmask 255.255.255.0}
+	\item Configure by hand on Ubuntu wired connection settings
+	\begin{enumerate}
+		\item Details -> Disable \textit{Connect Automatically}
+		\item IPv4 -> \textit{IPv4 Method} to \textit{Manual}
+		\item Set address to \texttt{10.0.0.2} and gateway to \texttt{255.255.255.0}
+	\end{enumerate}
+	\item Run \texttt{ssh pi\@10.0.0.1} and use \texttt{raspberry} as password
+\end{enumerate}
+
+\pagebreak
 \printbibliography
 
 \end{document}
