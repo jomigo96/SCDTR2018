@@ -37,3 +37,6 @@
 *.out
 *.synctex.gz
 *.toc
+
+# vim auxiliary files
+*.*~
