@@ -6,10 +6,13 @@ const int own_address = 4;
 void setup() {
   Serial.begin(9600);
 
-  TWAR = (own_address << 1) | 1; //Enable reception of broadcasts
   
+
   Wire.begin(own_address);
   Wire.onReceive(receiveEvent);
+
+  TWAR |= 1; //Enable reception of broadcasts
+
 }
 
 void receiveEvent(int c){
@@ -37,7 +40,7 @@ void loop() {
   }
   if(i>0){
     str[i]=0;
-    Wire.beginTransmission(0x00); //Broadcast
+    Wire.beginTransmission(0); //Broadcast
     Wire.write(str);
     Wire.endTransmission();
   }

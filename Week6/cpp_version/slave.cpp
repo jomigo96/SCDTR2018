@@ -5,7 +5,7 @@
 #include <signal.h>
 #include <linux/i2c-dev.h>
 #include <stdlib.h>
-#define SLAVE_ADDR 0x48
+#define SLAVE_ADDR 0x00
 
 int init_slave(bsc_xfer_t &xfer, int addr){
 
@@ -46,10 +46,13 @@ int main(void){
 	while(1){
 		xfer.txCnt = 0;
 		status = bscXfer(&xfer);
-		if(!(status & 1<<1)){ //checks if receive buffer is not empty
-			std::cout << "Received "<< xfer.rxCnt << " bytes" << std::endl;
-			for(int j = 0; j < xfer.rxBuf[j]; j++)
-				std::cout << xfer.rxBuf[j];
+		if(status){ 
+			if(xfer.rxCnt > 0){
+					std::cout << "Received "<< xfer.rxCnt << " bytes" << std::endl;
+					for(int j = 0; j < xfer.rxBuf[j]; j++)
+						std::cout << xfer.rxBuf[j];
+					std::cout << std::endl;
+				}
 		}
 	}
 }
