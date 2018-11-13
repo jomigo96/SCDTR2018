@@ -1,10 +1,13 @@
 #include <Wire.h>
 
 const int own_address = 4;
-const int peer_address = 5;
+
 
 void setup() {
   Serial.begin(9600);
+
+  TWAR = (own_address << 1) | 1; //Enable reception of broadcasts
+  
   Wire.begin(own_address);
   Wire.onReceive(receiveEvent);
 }
@@ -24,15 +27,18 @@ void receiveEvent(int c){
 
 void loop() {
 
-  char c;
+  char str[20];
+  int i;
 
+  i=0;
   while(Serial.available() > 0){
-    c=Serial.read();
-    Wire.beginTransmission(peer_address);
-    Wire.write(c);
+    str[i]=Serial.read();
+    i++;
+  }
+  if(i>0){
+    str[i]=0;
+    Wire.beginTransmission(0x00); //Broadcast
+    Wire.write(str);
     Wire.endTransmission();
   }
-
-  
-
 }
