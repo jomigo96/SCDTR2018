@@ -1,3 +1,4 @@
+#include <string.h>
 #include <iostream>
 #include <pigpio.h>
 #include <fcntl.h>
@@ -52,6 +53,8 @@ int main(void){
 					for(int j = 0; j < xfer.rxBuf[j]; j++)
 						std::cout << xfer.rxBuf[j];
 					std::cout << std::endl;
+					memset(xfer.rxBuf, 0 , BSC_FIFO_SIZE );
+					xfer.rxCnt=0;
 				}
 		}
 	}
