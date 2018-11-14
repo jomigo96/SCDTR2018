@@ -43,7 +43,9 @@
 \section{Introdução}
 
 \section{Raspbian Startup}
-
+\begin{comment}
+	Mas isto é para escrever em inglês??
+\end{comment}
 \begin{enumerate}
 	\item Open console
 	\item \texttt{sudo ifconfig enp2s0f0 10.0.0.2 netmask 255.255.255.0}
@@ -55,6 +57,8 @@
 	\end{enumerate}
 	\item Run \texttt{ssh pi\@10.0.0.1} and use \texttt{raspberry} as password
 \end{enumerate}
+
+\textbf{Importante:} antes de desligar o Raspberry Pi, correr \texttt{sudo shutdown -h now} para evitar corrupção do sistema operativo.
 
 \pagebreak
 \printbibliography

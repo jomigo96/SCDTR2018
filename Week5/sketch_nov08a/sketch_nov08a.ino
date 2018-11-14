@@ -4,7 +4,7 @@ const int own_address = 4;
 
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(230400);
 
   
 
@@ -40,7 +40,7 @@ void loop() {
   }
   if(i>0){
     str[i]=0;
-    Wire.beginTransmission(0); //Broadcast
+    Wire.beginTransmission(00); //Broadcast
     Wire.write(str);
     Wire.endTransmission();
   }
