@@ -3,6 +3,10 @@
 \documentclass{article}
 
 \input{preamble}
+\usepackage{circuitikz}
+\usetikzlibrary{positioning}
+
+\newcommand{\matr}[1]{\mathbf{#1}}
 
 \addbibresource{bibliography.bib}
 
@@ -38,14 +42,15 @@
 \setcounter{page}{1}
 
 {\hypersetup{linkcolor = black} \tableofcontents}
-\pagebreak
 
 \section{Introdução}
 
+\begin{tikzpicture}
+	\node at (0,0) (ard1) [anchor=south west,draw,minimum height=3,inner sep=1] {Arduino 1};
+	\node (ard2) [left=of ard1,anchor=south west,draw,minimum height=3,inner sep=1] {Arduino 2};
+\end{tikzpicture}
+
 \section{Raspbian Startup}
-\begin{comment}
-	Mas isto é para escrever em inglês??
-\end{comment}
 \begin{enumerate}
 	\item Open console
 	\item \texttt{sudo ifconfig enp2s0f0 10.0.0.2 netmask 255.255.255.0}
@@ -59,6 +64,56 @@
 \end{enumerate}
 
 \textbf{Importante:} antes de desligar o Raspberry Pi, correr \texttt{sudo shutdown -h now} para evitar corrupção do sistema operativo.
+
+\section{Optimização do Sistema Distribuído}
+
+\begin{gather*}
+	u^* = \textrm{argmin}\,J(x, \mu) \\
+	l_i = \sum^n_{j=1} d_j k_{ij} + o_i \geq L_i, \qquad 0 \leq d_i \leq 100, \quad \forall i \\
+	\matr{l} = \matr{K}\matr{d} + \matr{o} \geq \matr{L}, \qquad 0 \leq d \leq 100
+\end{gather*}
+Se as condições aqui listadas não forem cumpridas, o problema é declarado \textit{unfeasible}. A função de custo é
+\begin{gather*}
+	f(d) = c_1d_1 + c_2d_2 + \ldots + c_nd_n = \matr{C}^T\matr{d}
+\end{gather*}
+onde $\matr{c}$ é o vetor dos custos de energia.
+
+Ver os cantos do domínio admissível e saber o ponto com menor custo. Assim, obtém-se $(d_1,d_2)$. Mais à frente adicionamos maximização de longevidade de lâmpadas.
+\begin{figure}[ht]
+	\centering
+	\begin{tikzpicture}
+		\coordinate (axis) at (0,0);
+		\node at (0,5) [label={180:$d_2$}] {};
+		\node at (5,0) [label={-90:$d_1$}] {};
+		\draw [->] (axis) ++(0,-0.1) -- (0,5);
+		\draw [->] (axis) ++(-0.1,0)-- (5,0);
+		\draw [dashed,color={green!50!black}] (axis) (0,4) -- (4,4) -- (4,0);
+	\end{tikzpicture}
+\end{figure}
+
+\begin{tikzpicture}
+	\tikzstyle{arduino} = [draw,minimum height=80,inner sep=30];
+	\tikzstyle{wire} = [];
+	\node at (0,0) (ard1) [arduino] {\Large Arduino 1};
+	\node (ard2) [right=4cm of ard1,arduino] {\Large Arduino 2};
+	\node (rpi) [above=2cm of ard2,arduino] {\Large Raspberry Pi};
+	\path (ard1.north east) to node (ard1_scl) [auto, swap, align=right] {\ttfamily SCL} ++(0,-3);
+	\path (ard1.north east) to node (ard1_sda) [auto, swap, align=right] {\ttfamily SDA} ++(0,-4);
+	\path (ard1.north east) to node (ard1_gnd) [auto, swap, align=right] {\ttfamily GND} ++(0,-5);
+	\path (ard2.north west) to node (ard2_scl) [auto, align=left] {\ttfamily SCL} ++(0,-3);
+	\path (ard2.north west) to node (ard2_sda) [auto, align=left] {\ttfamily SDA} ++(0,-4);
+	\path (ard2.north west) to node (ard2_gnd) [auto, align=left] {\ttfamily GND} ++(0,-5);
+	\path (rpi.north west) to node (rpi_19) [auto, align=left] {\ttfamily 19} ++(0,-3);
+	\path (rpi.north west) to node (rpi_18) [auto, align=left] {\ttfamily 18} ++(0,-4);
+	\path (rpi.north west) to node (rpi_gnd) [auto, align=left] {\ttfamily GND} ++(0,-5);
+	\draw (ard1_scl) -- (ard2_scl) (ard1_sda) -- (ard2_sda) (ard1_gnd) -- (ard2_gnd);
+	\path (ard1_scl) ++(1.7,0) coordinate (coord1);
+	\path (ard1_sda) ++(2.4,0) coordinate (coord2);
+	\path (ard1_gnd) ++(3.1,0) coordinate (coord3);
+	\draw (coord1) to [short,*-,R] (coord1 |- rpi_19) to [short,-] (rpi_19.west);
+	\draw (coord2) to [short,*-,R] (coord2 |- rpi_18) to [short,-] (rpi_18.west);
+	\draw (coord3) to [short,*-] (coord3 |- rpi_gnd) to [short,-] (rpi_gnd.west);
+\end{tikzpicture}
 
 \pagebreak
 \printbibliography
