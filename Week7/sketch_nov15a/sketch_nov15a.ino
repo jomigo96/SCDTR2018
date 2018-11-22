@@ -1,41 +1,45 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <Wire.h>
+#define DEBUG
 
 // LED related
 const int ledPin = 3;
 int value = 0;
+const int led_on = 150;
 
 // Interupts
 volatile byte flag=0;
-volatile int count=0;
 
 // I2C
-
 enum State : short{
 
-  calibrate_0,
-  calibrate_1,
-  calibrate_2,
-  data,
-  
+	start_cal,
+	cal0,
+	cal0b,
+	cal1,
+	cal1b,
+	cal2,
+	cal2b,
+	control,
+	data,
+
 };
 
 typedef struct message{
     State state;
     byte address;
-}message_t; //Message struct. Maximum of 32 bytes?
+	float value;
+}message_t; 
 
-const byte own_address = 0x01; //The I2C address of this node, unique for each arduino. 
+const byte own_address = 0x01; 
 
-
-message_t last_message; //Actual message in memory
-volatile bool message_received = false; //Flag that shows that a message has been received
-bool to_send = true; //Flag that shows that it is this node's turn to send the next message
+volatile message_t message; 
+volatile bool message_received = false; 
 
 // LDR 
 const int sensor_pin = 0;
-int s1, s2, s3;
+int s;
 float v;
 float R;
 float L;
@@ -45,28 +49,53 @@ const float Raux = 10000;
 const float C = 1e-6;
 
 // State machine
-State state = calibrate_0;
+State state = start_cal;
+int count=0;
+bool flag_3s=false;
+bool flag_other=false;
 
-// Interupt service routine, turns flag true every few seconds
+// Control
+float K21 = 0;
+float background = 0;
+float own_gain=0.522;
+float L_other=false;
+
+// Interupt service routine, Period of 5ms
 ISR(TIMER1_COMPA_vect){
- count++;
- if(count > 1000){
-  flag=1;  
-  count = 0;
- }
+	flag=true;
+}
+
+inline void reset_counter(void){
+	count=0;
+	flag_3s=false;
+}
+
+float compute_lux(int s){
+  
+    v = s * 5.0/1.0230;
+    R = (5-v/1000.0)/(v/1000.0/Raux);
+    L = pow(10, (log10(R)-b)/m );
+    return L;
 }
 
 void receiveEvent(int c){ //Function that is called when a I2C message is received
 
-  char buf[20]; //Local buffer
+  char buf[32]; //Local buffer
   int i=0;
 
-    while((Wire.available() > 0)&&(i < sizeof(message_t))){ //reads at most the size of message_t
+    while((Wire.available() > 0)&&(i < sizeof(message_t))){ 
       buf[i]=Wire.read();
       i++;
     }
-    memcpy(&last_message, buf, sizeof(message_t)); //Copies the message from buffer to global memory
-    message_received=true; //signals that a message has been received
+    memcpy(&message, buf, sizeof(message_t)); 
+    message_received=true; 
+}
+
+void send_message(){
+
+	Wire.beginTransmission(0);
+	Wire.write((char*)&message, sizeof(message_t));
+	Wire.endTransmission();
 }
 
 void setup() {
@@ -98,36 +127,156 @@ void setup() {
 void loop() {
 
  if(message_received){ 
-  //Serial.println("Received a message!"); 
+ // Handle message
+
+	if(message.state == start_cal)
+		state = cal0b;
+
+	if((message.state == data) && ((state == cal1)||(state == cal2b))){
+		flag_other = true;
+		L_other = message.value;
+	}
 
   message_received = false;
-  to_send=true;
-  flag=false;
  }
 
  switch(state){
 
-  case calibrate_0:
+  case start_cal:
+	message.state=start_cal;
+	message.address=own_address;
+	send_message();
+	state = cal0;
+	reset_counter();
     break;
-  case calibrate_1:
+
+  case cal0:
+	analogWrite(ledPin, 0);
+	if(flag_3s){
+		flag_3s=false;
+
+		// Measuse background
+		s = analogRead(sensor_pin);
+		L = compute_lux(s);
+
+		background = L;
+
+		state = cal1;
+	}
     break;
-  case calibrate_2:
+
+  case cal0b:
+	analogWrite(ledPin, led_on);
+	if(flag_3s){
+		flag_3s=false;
+
+		// Measuse background
+		s = analogRead(sensor_pin);
+		L = compute_lux(s);
+
+		background = L;
+
+		state = cal1b;
+		reset_counter();
+	}
+    break;
+
+  case cal1:
+	analogWrite(ledPin, 0);
+	if(flag_other){
+		flag_other=false;
+
+		// Measuse influence of neighbour LED
+		s = analogRead(sensor_pin);
+		L = compute_lux(s);
+
+		K21 = L/L_other;
+		
+		state = cal2;
+		reset_counter();
+	}
+    break;
+
+  case cal1b:
+	analogWrite(ledPin, led_on);
+	if(flag_3s){
+		flag_3s=false;
+
+		// Measuse influence of own LED, and send it to neighbour
+		s = analogRead(sensor_pin);
+		L = compute_lux(s);
+
+		own_gain = L/led_on;
+
+		message.state = data;
+		message.value = L;
+		message.address = own_address;
+		send_message();
+		
+		state = cal2b;
+	}
+    break;
+
+  case cal2:
+	analogWrite(ledPin, led_on);
+	if(flag_3s){
+		flag_3s = false;
+
+		// Measuse influence of own LED, and send it to neighbour
+		s = analogRead(sensor_pin);
+		L = compute_lux(s);
+
+		own_gain = L/led_on;
+
+		message.state = data;
+		message.value = L;
+		message.address = own_address;
+		send_message();
+
+		state = control;
+	}
+    break;
+
+  case cal2b:
+	analogWrite(ledPin, 0);
+	if(flag_other){
+		flag_other=false;
+
+		// Measuse influence of neighbour LED
+		s = analogRead(sensor_pin);
+		L = compute_lux(s);
+
+		K21 = L/L_other;
+		
+		state = control;
+	}
+
+    break;
+  case control:
     break;
   case data:
     break;
  }
 
  if(flag){
-  if(to_send){ //Sends message for the other node to turn on his led
+	count++;
+	if(count > 600){
+		flag=true;
+		count=0;
+	}
+    flag=false;
 
-    last_message.turn=true;
-    last_message.address=own_address;
-    Wire.beginTransmission(0);
-    Wire.write((char*)&last_message, sizeof(message_t));
-    Wire.endTransmission();
-    to_send=false;
-    analogWrite(ledPin, 0); //Switches off own led
-  }
-  flag=false;
+#ifdef DEBUG
+	if(state == control){
+
+		Serial.println("Calibration done");
+		Serial.print("K21 = ");
+		Serial.println(K21);
+		Serial.print("Background = ");
+		Serial.println(background);
+		Serial.print("Self gain = ");
+		Serial.println(own_gain);
+	}
+#endif /*DEBUG*/
  }
 }
