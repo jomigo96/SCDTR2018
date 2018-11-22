@@ -11,15 +11,41 @@ volatile byte flag=0;
 volatile int count=0;
 
 // I2C
-const byte own_address = 0x01; //The I2C address of this node, unique for each arduino. 
+
+enum State : short{
+
+  calibrate_0,
+  calibrate_1,
+  calibrate_2,
+  data,
+  
+};
+
 typedef struct message{
-    bool turn;
+    State state;
     byte address;
 }message_t; //Message struct. Maximum of 32 bytes?
+
+const byte own_address = 0x01; //The I2C address of this node, unique for each arduino. 
+
 
 message_t last_message; //Actual message in memory
 volatile bool message_received = false; //Flag that shows that a message has been received
 bool to_send = true; //Flag that shows that it is this node's turn to send the next message
+
+// LDR 
+const int sensor_pin = 0;
+int s1, s2, s3;
+float v;
+float R;
+float L;
+const float b = 5.3060;
+const float m = -0.7724;
+const float Raux = 10000;
+const float C = 1e-6;
+
+// State machine
+State state = calibrate_0;
 
 // Interupt service routine, turns flag true every few seconds
 ISR(TIMER1_COMPA_vect){
@@ -71,17 +97,24 @@ void setup() {
 
 void loop() {
 
- if(message_received){ //When a message is received, this node turns it's led on, and is resposnible to send the next message.
-  Serial.println("Received a message!"); 
+ if(message_received){ 
+  //Serial.println("Received a message!"); 
 
-  if(last_message.turn){
-    analogWrite(ledPin, 150);  
-  }else{
-    analogWrite(ledPin, 0);  
-  }
   message_received = false;
   to_send=true;
   flag=false;
+ }
+
+ switch(state){
+
+  case calibrate_0:
+    break;
+  case calibrate_1:
+    break;
+  case calibrate_2:
+    break;
+  case data:
+    break;
  }
 
  if(flag){
