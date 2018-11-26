@@ -32,7 +32,7 @@ typedef struct message{
 	float value;
 }message_t; 
 
-const byte own_address = 0x01; 
+const byte own_address = 0x02; 
 
 message_t message; // maybe needs to be volatile
 volatile bool message_received = false; 
@@ -93,6 +93,12 @@ void receiveEvent(int c){ //Function that is called when a I2C message is receiv
   memcpy(&message, buf, sizeof(message_t)); 
 	
 	message_received=true; 
+#ifdef DEBUG
+  Serial.println("Incoming message:");
+  Serial.println(message.state);
+  Serial.println(message.address);
+  Serial.println(message.value);
+#endif
 }
 
 void send_message(){
@@ -100,6 +106,13 @@ void send_message(){
 	Wire.beginTransmission(0);
 	Wire.write((char*)&message, sizeof(message_t));
 	Wire.endTransmission();
+#ifdef DEBUG
+  Serial.println("Outgoing message:");
+  Serial.println(message.state);
+  Serial.println(message.address);
+  Serial.println(message.value);
+#endif
+ 
 }
 
 /**************************************************************************/
@@ -291,22 +304,24 @@ void loop() {
 
 	if(flag){
 		count++;
-		if(count > 600){
-			flag=true;
+		if(count > 2000){
+			flag_3s=true;
 			count=0;
 		}
 	flag=false;
 
 #ifdef DEBUG
 		if(state == control){
-
-			Serial.println("Calibration done");
-			Serial.print("K21 = ");
-			Serial.println(K21);
-			Serial.print("Background = ");
-			Serial.println(background);
-			Serial.print("Self gain = ");
-			Serial.println(own_gain);
+      if(flag_3s){
+  			Serial.println("Calibration done");
+  			Serial.print("K21 = ");
+  			Serial.println(K21);
+  			Serial.print("Background = ");
+  			Serial.println(background);
+  			Serial.print("Self gain = ");
+  			Serial.println(own_gain);
+        flag_3s=false;
+      }
 		}
 #endif /*DEBUG*/
 	}
