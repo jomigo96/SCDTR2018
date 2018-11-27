@@ -19,7 +19,6 @@
 	\includegraphics[width = 0.4\linewidth, trim = {172.4pt 202.7pt 172.6pt 201.4pt}, clip]{IST_A_CMYK_POS}
 	
 	\vspace*{0.1\textheight}
-%	\vspace{\fill}
 	{\huge\bfseries Real-Time Cooperative Decentralized Control of a Smart Office Illumination System}
 	
 	\vspace*{0.03\textheight}
@@ -45,11 +44,6 @@
 
 \section{Introdução}
 
-\begin{tikzpicture}
-	\node at (0,0) (ard1) [anchor=south west,draw,minimum height=3,inner sep=1] {Arduino 1};
-	\node (ard2) [left=of ard1,anchor=south west,draw,minimum height=3,inner sep=1] {Arduino 2};
-\end{tikzpicture}
-
 \section{Raspbian Startup}
 \begin{enumerate}
 	\item Open console
@@ -63,7 +57,7 @@
 	\item Run \texttt{ssh pi\@10.0.0.1} and use \texttt{raspberry} as password
 \end{enumerate}
 
-\textbf{Importante:} antes de desligar o Raspberry Pi, correr \texttt{sudo shutdown -h now} para evitar corrupção do sistema operativo.
+\paragraph{Importante} Antes de desligar o Raspberry Pi, correr \texttt{sudo shutdown -h now} para evitar corrupção do sistema operativo.
 
 \section{Optimização do Sistema Distribuído}
 
@@ -85,11 +79,17 @@ Ver os cantos do domínio admissível e saber o ponto com menor custo. Assim, ob
 		\coordinate (axis) at (0,0);
 		\node at (0,5) [label={180:$d_2$}] {};
 		\node at (5,0) [label={-90:$d_1$}] {};
-		\draw [->] (axis) ++(0,-0.1) -- (0,5);
-		\draw [->] (axis) ++(-0.1,0)-- (5,0);
+		\draw [step=0.25,draw=black!10!white,very thin] (-0.9,-0.4) grid (4.9,4.9);
+		\draw [step=1,draw=black!20!white,very thin] (-0.9,-0.4) grid (4.9,4.9);
+		\fill [fill=green,opacity=0.3] (0,0) -- (0,4) -- (4,4) -- (4,0) -- cycle;
+		\draw [->] (axis) ++(0,-0.5) -- (0,5);
+		\draw [->] (axis) ++(-1,0) -- (5,0);
 		\draw [dashed,color={green!50!black}] (axis) (0,4) -- (4,4) -- (4,0);
 	\end{tikzpicture}
 \end{figure}
+
+\appendix
+\section{Esquemas}
 
 \begin{tikzpicture}
 	\tikzstyle{arduino} = [draw,minimum height=80,inner sep=30];

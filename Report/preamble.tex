@@ -10,7 +10,7 @@
 % -- Tipo de letra
 \usepackage{newpxtext}
 \usepackage{eulervm}
-\usepackage{nimbusmono}
+\usepackage[scaled = 1.05]{nimbusmono}
 
 %\usepackage{lmodern}
 %\usepackage[T1]{fontenc}
@@ -18,10 +18,8 @@
 % -- Definir margens do documento
 \usepackage{geometry}
 \geometry{nomarginpar,
-    tmargin = 2.5cm,
-    bmargin = 2.5cm,
-    lmargin = 2.5cm,
-    rmargin = 2.5cm}
+		vmargin = 2cm,
+		hmargin = 3cm,}
 %\usepackage{showframe}
 
 % -- Cabeçalho e rodapé
@@ -74,7 +72,7 @@
 \usetikzlibrary{arrows.meta,positioning}
 \pgfplotsset{compat=1.5}
 \pgfplotsset{table/search path = {data}}
-\pgfplotsset{	/pgf/number format/use comma,}
+\pgfplotsset{/pgf/number format/use comma,}
 
 % -- Integrar código fonte
 \usepackage{minted}
