@@ -44,6 +44,8 @@
 
 \section{Introdução}
 
+\todo[inline]{Mencionar que toda a implementação é feita para 2 nodes, apesar de ser tudo extensível, blah blah}
+
 \section{Raspbian Startup}
 \begin{enumerate}
 	\item Open console
@@ -58,6 +60,42 @@
 \end{enumerate}
 
 \paragraph{Importante} Antes de desligar o Raspberry Pi, correr \texttt{sudo shutdown -h now} para evitar corrupção do sistema operativo.
+
+
+\section{Illumination system calibration}
+
+\subsection{Principles of the calibration procedure}
+
+The illuminance at each desk follows the model
+\begin{align}
+  L &= K \mathbf{d} + \mathbf{o} \nonumber \\ 
+  \left[\begin{array}{c} l_{1}\\ l_{2} \end{array}\right] &=
+  \left[\begin{array}{cc}
+	k_{11} & k_{12}\\
+	k_{21} & k_{22}
+  \end{array}\right]
+  \left[\begin{array}{c} d_{1}\\ d_{2}\end{array}\right]+
+  \left[\begin{array}{c} o_{1}\\ o_{2} \end{array}\right],
+  \label{eq:model}
+\end{align}
+where $l_i$, $d_i$ and $o_i$ are the illuminance, LED power (in percentage) and background illuminance at desk $i$, respectively. The purpose of the calibration is to find the values for $k_{ij}$ and $o_i$ for a given office layout.
+
+The calibration is performed by turning the lumiaires synchronously and taking measurements. One node takes initiative and sends a message to trigger the process. First, both LEDs are switched off and $o_i$ is measured.
+Then, node 2 turns on its LED, measures the resulting illuminance and computes $k_{22}$, and sends the illuminance to node 1. Receiving this value, node 1 can also measure its illuminance and compute $k_{21}$. The operation inverts and $k_{12}$ and $k_{11}$ are determined. In the end, nodes share the results.
+
+\subsection{Implementation detais}
+
+The previous procedure is implemented as its own module, with a special communication protocol. The flow chart in figure \ref{fig:cal} illustrates messages sent and summarizes the finite-state machine.
+Between changing the LED state and taking measurements, the nodes must sleep, to guarantee that the measurement is taken in steady state. For this, they were set to sleep for a lenght of time 10 times the value of the system time constant, $10 \times \SI{5}{\milli \second} = \SI{50}{\milli \second}$. 
+
+\begin{figure}[ht]
+  \centering
+  \missingfigure{Diagrama da maquina de estados, em tikz}
+  \caption{Calibration finite-state machine, with communication events.}
+  \label{fig:cal}
+\end{figure}
+
+It also should be noted that internally, the nodes are not distinguishable as 1 and 2. Each considers itself node 1 and the peer as 2, so the representation of the coupling matrix $K$ is transposed by both diagonals, and identically $o_1$ and $o_2$ are swapped.
 
 \section{Optimização do Sistema Distribuído}
 
@@ -118,4 +156,6 @@ Ver os cantos do domínio admissível e saber o ponto com menor custo. Assim, ob
 \pagebreak
 \printbibliography
 
+
+\listoftodos
 \end{document}
