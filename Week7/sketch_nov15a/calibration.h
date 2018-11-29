@@ -16,6 +16,7 @@ extern Controller controller;
 enum State : short{
 
 	start_cal,
+	wait,
 	cal0,
 	cal0b,
 	cal1,
@@ -66,14 +67,12 @@ int run_calibration(int mode){
 			// Handle message
 			if(message.code == calibration_request){
 				state = cal0b;
-        reset_counter(&count, &flag_3s);
+		        reset_counter(&count, &flag_3s);
 			}
 	
-			if((message.code == data) && ((state == cal1)||(state == cal2b)||(state == cal2))){
+			if((message.code == data) || (message.code == acknowledge) ||(message.code == cont)){
 				flag_other = true;
 			}
-			if(message.code == acknowledge)
-				flag_other = true;
 	
 			message_received = 0;
 		}
@@ -113,8 +112,7 @@ int run_calibration(int mode){
 					// Measuse influence of neighbour LED
 					s = analogRead(sensor_pin);
 					L = controller.compute_lux(s);
-					L_other = message.value[0];	
-					K21 = L/L_other;
+					K12 = (L-o1)/(led_on/255.0);
 				
 					message.code = acknowledge;
 					message.address = own_address;
@@ -125,8 +123,8 @@ int run_calibration(int mode){
 #ifdef DEBUG
 					Serial.print("State cal1, LUX = ");
 					Serial.println(L);
-					Serial.print("Peer LUX = ");
-					Serial.println(L_other);
+					Serial.print("K12 = ");
+					Serial.println(K12);
 #endif
 				}
 			break;
@@ -140,26 +138,27 @@ int run_calibration(int mode){
 					s = analogRead(sensor_pin);
 					L = controller.compute_lux(s);
 		
-					K11 = L/led_on;
+					K11 = (L-o1)/(led_on/255.0);
 		
 					message.code = data;
-					message.value[0] = L;
-					message.value[1] = K21;
-					message.value[2] = K11;
-					message.value[3] = o1;
+					message.value[0] = o1;
+					message.value[1] = K11;
+					message.value[2] = K12;
 					message.address = own_address;
 					send_message();
 #ifdef DEBUG
 					Serial.print("State cal2, LUX =  ");
 					Serial.println(L);
+					Serial.print("K11 = ");
+					Serial.println(K11);
 #endif
 				}
 				if(flag_other){
 					flag_other = false;
 
 					o2 = message.value[0];
-					K12 = message.value[1];
-					K22 = message.value[2];
+					K22 = message.value[1];
+					K21 = message.value[2];
 					
 					state = done;
 
@@ -195,16 +194,17 @@ int run_calibration(int mode){
 					s = analogRead(sensor_pin);
 					L = controller.compute_lux(s);
 		
-					K11 = L/led_on;
+					K11 = (L-o1)/(led_on/255.0);
 		
-					message.code = data;
-					message.value[0] = L;
+					message.code = cont;
 					message.address = own_address;
 					send_message();
 				
 #ifdef DEBUG
 					Serial.print("State cal1b, LUX =  ");
 					Serial.println(L);
+					Serial.print("K11 = ");
+					Serial.println(K11);
 #endif
 				}
 				if(flag_other){
@@ -222,26 +222,25 @@ int run_calibration(int mode){
 					// Measuse influence of neighbour LED
 					s = analogRead(sensor_pin);
 					L = controller.compute_lux(s);
-					L_other = message.value[0];
-					K21 = L/L_other;
+					K12 = (L-o1)/(led_on/255.0);
 				
-					K12 = message.value[1];
-					K22 = message.value[2];
-					o2 = message.value[3];
+					o2 = message.value[0];
+					K22 = message.value[1];
+					K21 = message.value[2];
 
 					message.address = own_address;
 					message.code = data;
 					message.value[0] = o1;
-					message.value[1] = K21;
-					message.value[2] = K11;
+					message.value[1] = K11;
+					message.value[2] = K12;
 					send_message();
 
 					state = done;
 #ifdef DEBUG
 					Serial.print("State cal2b, LUX = ");
 					Serial.println(L);
-					Serial.print("Peer LUX = ");
-					Serial.println(L_other);
+					Serial.print("K12 = ");
+					Serial.println(K12);
 #endif
 				}
 			break;
@@ -254,6 +253,10 @@ int run_calibration(int mode){
 				Serial.println(o1);
 				Serial.print("o2 = ");
 				Serial.println(o2);
+        Serial.print("K11 = ");
+        Serial.println(K11);
+        Serial.print("K22 = ");
+        Serial.println(K22);
 				Serial.print("K12 = ");
 				Serial.println(K12);
 				Serial.print("K21 = ");

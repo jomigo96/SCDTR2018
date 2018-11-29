@@ -16,7 +16,7 @@ int pwm_value = 0;
 volatile byte isr_flag=0;
 
 // I2C
-const byte own_address = 0x01; 
+const byte own_address = 0x09; 
 message_t message; // maybe these need to be volatile?
 byte message_received = false; 
 
@@ -73,7 +73,7 @@ void setup() {
   Serial.println("--- Arduino restarted ---");
 #endif
 
-  //run_calibration(0);
+  run_calibration(0);
 
 }
 

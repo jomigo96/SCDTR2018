@@ -10,6 +10,7 @@ enum MsgCode : uint8_t{
 
 	calibration_request,
 	data,
+	cont,
 	acknowledge,
 
 };
