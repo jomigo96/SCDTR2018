@@ -1,0 +1,23 @@
+\begin{tikzpicture}
+	\tikzstyle{arduino} = [draw,minimum height=80,inner sep=30];
+	\tikzstyle{wire} = [];
+	\node at (0,0) (ard1) [arduino] {\Large Arduino 1};
+	\node (ard2) [right=4cm of ard1,arduino] {\Large Arduino 2};
+	\node (rpi) [above=2cm of ard2,arduino] {\Large Raspberry Pi};
+	\path (ard1.north east) to node (ard1_scl) [auto, swap, align=right] {\ttfamily SCL} ++(0,-3);
+	\path (ard1.north east) to node (ard1_sda) [auto, swap, align=right] {\ttfamily SDA} ++(0,-4);
+	\path (ard1.north east) to node (ard1_gnd) [auto, swap, align=right] {\ttfamily GND} ++(0,-5);
+	\path (ard2.north west) to node (ard2_scl) [auto, align=left] {\ttfamily SCL} ++(0,-3);
+	\path (ard2.north west) to node (ard2_sda) [auto, align=left] {\ttfamily SDA} ++(0,-4);
+	\path (ard2.north west) to node (ard2_gnd) [auto, align=left] {\ttfamily GND} ++(0,-5);
+	\path (rpi.north west) to node (rpi_19) [auto, align=left] {\ttfamily 19} ++(0,-3);
+	\path (rpi.north west) to node (rpi_18) [auto, align=left] {\ttfamily 18} ++(0,-4);
+	\path (rpi.north west) to node (rpi_gnd) [auto, align=left] {\ttfamily GND} ++(0,-5);
+	\draw (ard1_scl) -- (ard2_scl) (ard1_sda) -- (ard2_sda) (ard1_gnd) -- (ard2_gnd);
+	\path (ard1_scl) ++(1.7,0) coordinate (coord1);
+	\path (ard1_sda) ++(2.4,0) coordinate (coord2);
+	\path (ard1_gnd) ++(3.1,0) coordinate (coord3);
+	\draw (coord1) to [short,*-,R] (coord1 |- rpi_19) to [short,-] (rpi_19.west);
+	\draw (coord2) to [short,*-,R] (coord2 |- rpi_18) to [short,-] (rpi_18.west);
+	\draw (coord3) to [short,*-] (coord3 |- rpi_gnd) to [short,-] (rpi_gnd.west);
+\end{tikzpicture}

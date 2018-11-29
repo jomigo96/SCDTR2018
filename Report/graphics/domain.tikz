@@ -1,0 +1,11 @@
+\begin{tikzpicture}
+	\coordinate (axis) at (0,0);
+	\node at (0,5) [label={180:$d_2$}] {};
+	\node at (5,0) [label={-90:$d_1$}] {};
+	\draw [step=0.25,draw=black!10!white,very thin] (-0.9,-0.4) grid (4.9,4.9);
+	\draw [step=1,draw=black!20!white,very thin] (-0.9,-0.4) grid (4.9,4.9);
+	\fill [fill=green,opacity=0.3] (0,0) -- (0,4) -- (4,4) -- (4,0) -- cycle;
+	\draw [->] (axis) ++(0,-0.5) -- (0,5);
+	\draw [->] (axis) ++(-1,0) -- (5,0);
+	\draw [dashed,color={green!50!black}] (axis) (0,4) -- (4,4) -- (4,0);
+\end{tikzpicture}

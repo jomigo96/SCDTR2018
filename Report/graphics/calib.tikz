@@ -1,0 +1,28 @@
+\begin{tikzpicture}
+	\tikzstyle{every node}=[font=\footnotesize];
+	\tikzstyle{stt}=[draw,rectangle,align=center,inner sep=4pt,minimum width=20mm,fill,pattern=crosshatch dots,pattern color=black!30!white,font=\ttfamily];
+	\tikzstyle{stp}=[draw,rectangle,align=center,inner sep=4pt,minimum width=20mm,rounded corners=5pt,fill,pattern=crosshatch,pattern color=black!15!white];
+	\tikzstyle{pth}=[draw,->,thick];
+	\matrix[row sep=8mm,column sep=3cm]{
+		\node (master_start) [] {\textbf{Master}};			& \node (slave_start) [] {\textbf{Slave}};			\\
+		\node (m1) [stt] {start\_cal};						& \node (s1) [circle, draw] {};						\\
+		\node (m2) [stt] {Cal 0 \\ LED Off};				& \node (s2) [stt] {Cal 1b};						\\
+		\node (m3) [stp] {Wait $T$ \\ Then measure $L$};	& \node (s3) [stp] {Wait $T$ \\ Then measure $L$};	\\
+		\node (m4) [stt] {Cal 1 \\ LED Off};				& \node (s4) [stt] {Cal 1b \\ LED On};				\\
+		\node (m5) [stp] {Wait for \\ signal};				& \node (s5) [stp] {Wait $T$ then \\ measure $L$};	\\
+		\node (m6) [stp] {Measure};							& \node (s6) [stp] {Wait for \\ signal};			\\
+		\node (m7) [stt] {Cal 2 \\ LED On};					& \node (s7) [stt] {Cal 2b \\ LED Off};				\\
+		\node (m8) [stp] {Wait $T$ \\ then measure};		& \node (s8) [stp] {Wait \\ for data};				\\
+		\node (m9) [stp] {Wait for \\ data};				& \node (s9) [stp] {Measure};						\\
+		\node (master_end) [stt] {Done};					& \node (slave_end) [stt] {Done};					\\
+	};
+	\graph [use existing nodes,edges=-{Stealth[]}]{
+		master_start -> m1 -> m2 -> m3 -> m4 -> m5 -> m6 -> m7 -> m8 -> m9 -> master_end;
+		s1 -> s2 -> s3 -> s4 -> s5 -> s6 -> s7 -> s8 -> s9 -> slave_end;
+		m1 -> [edge node={node[font=\footnotesize\ttfamily,auto]{calibration request}}] s1;
+		s5 -> [edge node={node[font=\footnotesize\ttfamily,auto,swap]{cont}}] m5;
+		m6 -> [edge node={node[font=\footnotesize\ttfamily,auto]{acknowledge}}] s6;
+		m8 -> [edge node={node[font=\footnotesize\ttfamily,auto]{data}}] s8;
+		s9 -> [edge node={node[font=\footnotesize\ttfamily,auto,swap]{data}}] m9;
+	};
+\end{tikzpicture}
