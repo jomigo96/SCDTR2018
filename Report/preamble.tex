@@ -1,39 +1,8 @@
 % -- Texto e codificação
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage[portuguese]{babel}
-\usepackage{microtype}
-\usepackage{xcolor}
 \usepackage{anyfontsize}
 \usepackage{pdflscape}
 
-% -- Tipo de letra
-\usepackage{newpxtext}
-\usepackage{eulervm}
-\usepackage[scaled = 1.05]{nimbusmono}
-
-%\usepackage{lmodern}
-%\usepackage[T1]{fontenc}
-
-% -- Definir margens do documento
-\usepackage{geometry}
-\geometry{nomarginpar,
-		vmargin = 2cm,
-		hmargin = 3cm,}
-%\usepackage{showframe}
-
-% -- Cabeçalho e rodapé
-\usepackage{fancyhdr}
-\fancyhf{}
-\fancyhead[L]{\textsc{}}
-\fancyhead[R]{\textsc{}}
-\fancyfoot[C]{\thepage}
-\pagestyle{fancy}
-\renewcommand\headrulewidth{0.2pt}
-\renewcommand\footrulewidth{0pt}
-
 % -- Funções matemáticas extra
-\usepackage{mathtools}
 \usepackage{siunitx}
 
 % -- Símbolos extra
@@ -41,13 +10,6 @@
 \usepackage{textcomp}
 \usepackage{gensymb}
 \usepackage{cancel}
-
-% -- Referências
-\usepackage{hyperref}
-\hypersetup{colorlinks,
-	linkcolor	= {red!50!black},
-	citecolor	= {green!30!black},
-	urlcolor	= {blue!80!black}}
 
 % -- Bibliografia
 \usepackage[
@@ -59,7 +21,6 @@
 \usepackage{csquotes}
 
 % --  Definições de imagens
-\usepackage{graphicx}
 \graphicspath{{graphics/}}
 \usepackage{caption}
 \usepackage{subcaption}
@@ -69,8 +30,9 @@
 % -- Desenhar circuitos elétricos e lógicos
 \usepackage{tikz}
 \usepackage{pgfplots}
-\usetikzlibrary{arrows.meta,positioning}
-\pgfplotsset{compat=1.5}
+\usepackage{circuitikz}
+\usetikzlibrary{arrows.meta,positioning,patterns,graphs}
+\pgfplotsset{compat=1.16}
 \pgfplotsset{table/search path = {data}}
 \pgfplotsset{/pgf/number format/use comma,}
 
