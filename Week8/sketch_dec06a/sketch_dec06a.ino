@@ -1,5 +1,4 @@
-#define DEBUG
-#define NODE1
+#define NODE
 #define SUPRESS_LUX
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -12,7 +11,7 @@
 
 // LED 
 const int led_pin = 3;
-int pwm_value = 0;
+int dimming = 0;
 
 // Interupts
 volatile byte isr_flag=0;
@@ -38,13 +37,18 @@ float K11 = 200;
 float K22 = 200;
 float o1 = 0; // Background illuminance levels
 float o2 = 0;
-float target;
+float target, L;
+float c1=1, c2=1;
 
 #ifdef NODE1
 Controller controller = Controller(5.8515, -0.9355, 10000, 1e-6);
 #else
 Controller controller = Controller(7.3250, -1.4760, 10000, 1e-6);
 #endif
+
+int lower_bound = 80;
+
+
 
 /**************************************************************************/
 // Functions
@@ -114,7 +118,11 @@ void loop() {
 	if(isr_flag){
 		isr_flag=0;
 
-		target = 80;
-		controller.PID_control(target);
+		target = lower_bound;
+
+
+		controller.PID_control(target, dimming, L);
+
+		send_sample_time_data(own_address, dimming, lower_bound, L, o1, target, c1);
 	}
 }

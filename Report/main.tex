@@ -7,6 +7,9 @@
 \title{Distributed Real-Time Control Systems}
 
 \newcommand{\matr}[1]{\mathbf{#1}}
+\newcommand{\ccode}[1]{\mintinline{c}{#1}}
+
+\def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;} 
 
 \addbibresource{bibliography.bib}
 
@@ -109,6 +112,89 @@ Ver os cantos do domínio admissível e saber o ponto com menor custo. Assim, ob
 	\input{graphics/domain.tikz}
 	\caption{Admissible domain and dimming value selection.}
 \end{figure}
+
+
+\section{Arduino data fomat}
+
+{\centering \textit{Provisory section so that Daniel can start the web-server}}
+
+Each Arduino sends data at every sample time so that the server can store the necessary information. 
+
+A message is designed to be a fixed-size word, with the least number of bits possible.
+Currently, the message has 20 bytes, as seen in this segment from \texttt{comms.h}:
+\todo[inline]{Minted com xelatex exibe as tabs como \texttt{^^I}. E os underscores, se não fizer escape dão erros com o Tikz.}
+\begin{minted}[linenos, firstnumber = 20, frame = leftline]{c}
+typedef struct msg{
+    MsgCode code; // 1 byte
+    uint8\_t address; // 1 byte
+    uint8\_t aux1; // 1 byte
+    uint8\_t aux2; // 1 byte
+    float value[4]; // 4 x 4 = 16 bytes
+
+}message\_t; //size fixed to 20 bytes
+\end{minted}
+
+\ccode{code} is an unsigned integer (\ccode{uint8\_t}) which represents what the data format is.
+Some values for this are used in the callibration procedure, but the value for sample time data forwarding is, for now, 5.
+A way of knowing this every time is having the same \ccode{enum} in the server as in the Arduino \texttt{comms} module:
+\begin{minted}[linenos, firstnumber = 9, frame = leftline]{c}
+enum MsgCode : uint8\_t{
+
+    calibration\_request,
+    data,
+    cont,
+    acknowledge,
+    consensus\_data,
+    sampling\_time\_data,
+
+};
+\end{minted}
+
+The rest of the data is:
+\begin{table}[h]
+  \centering
+  \begin{tabular}[h]{l|l}
+    \ccode{address} & Arduino's I2C address. \\
+    \ccode{aux1}    & 1st MSB: Desk occupancy state (1 for occupied, 0 for free). \\
+                    & next 7 bits, led duty cycle, unsigned integer from 0 to 100. \\
+    \ccode{aux2}    & Illuminance lower bound (presumably 40 or 80), in LUX. \\
+    \ccode{value[0]}& Measured illuminance, in LUX. \\
+    \ccode{value[1]}& Local background illuminance, in LUX. \\
+    \ccode{value[2]}& Instantaneous control illuminance reference, in LUX. \\
+    \ccode{value[3]}& Instantaneous power consumption, units to be defined. 
+  \end{tabular}
+\end{table}
+
+Note, to extract the duty cycle and occupancy state, you can do:
+\begin{minted}[]{c}
+  unsigned duty\_cycle = aux1 & (0x7F); // This is a bit-wise and with 0111111
+  bool state = aux1 & (0x80); // This is a bit-wise and with 10000000 
+\end{minted}
+
+From what I see, this is everything we need to send the server, and it should be able to compute the necessary variables. The following table should summarize my thoughts:
+\begin{table}[h]
+  \centering
+  \begin{tabularx}{\linewidth}{l|X}
+	Quantity & How to determine (\checkmark means it is sent every sample time) \\
+	Illuminance & \checkmark \\
+	duty cycle  & \checkmark \\
+	occupancy state & \checkmark \\
+	lower bound & \checkmark \\
+	Control reference & \checkmark \\
+	Background illuminance & \checkmark \\
+	Instantaneous power consumption & \checkmark \\
+	Total power consumption & Sum of instantaneous power consumption for all nodes. \\
+	Time since last restart & listen to a specific message code (to be defined) and keep the timestamp. \\
+	Node energy spent since last restart & integrate node's instantaneous power consumption, sample time is fixed and known. \\
+	Total energy since last restart & Sum both nodes's energy spent. \\
+	Node confort error since last restart & At each sample time we have the lower bound and the illuminance, do the math. \\
+	Total confort error since last restart & Sum both nodes' confort error. \\
+	Node flicker since last restart & See project description, all that is needed is the illuminance from the last 3 samples. \\
+	Total flicker since last restart & Sum both nodes' flicker.
+  \end{tabularx}
+\end{table}
+
+I might have missed something, we'll see.
 
 \appendix
 \section{Esquemas}

@@ -52,15 +52,21 @@ public:
 		return pow(10, (log10(R)-b)/m );
 
 	}
-	void PID_control(float target){
+	void PID_control(const float &target, int &dimming, float &L){
 	
 		int s1, s2, s3;
-		float v, ff, R, value;
-		float Ltarget, error, L;
+		float v, ff, R, value, Ltarget;
+		float error;
 		const float epsilon = 0.7;
 		const float KP=0.05;
 		const float KI=0.00001;
 		const float h=0.005;
+
+		
+#ifdef TIMING
+		long t1, t2;
+		t1 = micros();
+#endif
 
 		// Resets simulator if reference value changes
 		if(target != last_target){
@@ -92,9 +98,15 @@ public:
 		value = round(ff+u);
 		analogWrite(led_pin, saturation(value));
     
+#ifdef TIMING
+		t2 = micros();
+		Serial.print("PID time taken (micros): ");
+		Serial.println(t2-t1);
+#endif
+
 		//Clean-up
 #ifndef SUPRESS_LUX
-    Serial.println(L);
+		Serial.println(L);
 #endif
 		t += h;
 	    
@@ -109,6 +121,7 @@ public:
 	    
 		error_keep = error;
 
+		dimming = round(saturation(value)/255.0*100.0); // Dimming, 0-100
 	}
 
 private:
