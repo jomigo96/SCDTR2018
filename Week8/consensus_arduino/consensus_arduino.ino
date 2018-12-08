@@ -3,7 +3,7 @@ bool feasibility(float* d, float* k, int* e, float o, int L) {
     return True
   }
   else {
-    return False 
+    retur False 
   }
 }
 
@@ -23,7 +23,7 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   
-  d_av[2] = {d[0]*2, d[1]*2};
+  d_av[2] = {d[0], d[1]};
   y[2] = {y[0] + rho(d[0] - d_av[0]), y[1] + rho(d[1] - d_av[1])};
   z[2] = {rho*d_av[0] - c[0] - y[0], rho*d_av[1] - c[1] - y[1]};
   d[2] = min(0.5*rho*(d[0]*d[0]+d[1]*d[1]) - d[0]*z[0] - d[1]*z[1]);
