@@ -11,6 +11,12 @@
 \global\let\tikz@ensure@dollar@catcode=\relax
 \makeatother
 
+%\definecolor{codebg}{rgb}{0.97,0.97,0.97}
+%\setminted[c]{bgcolor = codebg, breaklines, linenos}
+%\setmintedinline[c]{bgcolor = {}}
+
+\setminted[c]{linenos, frame = leftline, breaklines}
+
 \newrobustcmd*{\matr}[1]{\mathbf{#1}}
 \newrobustcmd*{\ccode}[1]{\mintinline{c}{#1}}
 
@@ -127,7 +133,7 @@ Each Arduino sends data at every sample time so that the server can store the ne
 A message is designed to be a fixed-size word, with the least number of bits possible.
 Currently, the message has 20 bytes, as seen in this segment from \texttt{comms.h}:
 %\todo[inline]{Minted com xelatex exibe as tabs como \texttt{^^I}. E os underscores, se não fizer escape dão erros com o Tikz.}
-\begin{minted}[linenos, firstnumber = 20, frame = leftline]{c}
+\begin{minted}[firstnumber = 20]{c}
 typedef struct msg{
     MsgCode code; // 1 byte
     uint8_t address; // 1 byte
@@ -138,10 +144,10 @@ typedef struct msg{
 }message_t; //size fixed to 20 bytes
 \end{minted}
 
-\ccode{code} is an unsigned integer (\ccode{uint8\_t}) which represents what the data format is.
+\ccode{code} is an unsigned integer (\ccode{uint8_t}) which represents what the data format is.
 Some values for this are used in the callibration procedure, but the value for sample time data forwarding is, for now, 5.
 A way of knowing this every time is having the same \ccode{enum} in the server as in the Arduino \texttt{comms} module:
-\begin{minted}[linenos, firstnumber = 9, frame = leftline]{c}
+\begin{minted}[firstnumber = 9]{c}
 enum MsgCode : uint8_t{
 
     calibration_request,
@@ -155,22 +161,23 @@ enum MsgCode : uint8_t{
 \end{minted}
 
 The rest of the data is:
-\begin{table}[h]
-  \centering
-  \begin{tabular}[h]{l|l}
-    \ccode{address} & Arduino's I2C address. \\
-    \ccode{aux1}    & 1st MSB: Desk occupancy state (1 for occupied, 0 for free). \\
-                    & next 7 bits, led duty cycle, unsigned integer from 0 to 100. \\
-    \ccode{aux2}    & Illuminance lower bound (presumably 40 or 80), in LUX. \\
-    \ccode{value[0]}& Measured illuminance, in LUX. \\
-    \ccode{value[1]}& Local background illuminance, in LUX. \\
-    \ccode{value[2]}& Instantaneous control illuminance reference, in LUX. \\
-    \ccode{value[3]}& Instantaneous power consumption, units to be defined. 
-  \end{tabular}
+\begin{table}[ht]
+	\centering
+	\begin{tabular}[h]{l|l}\toprule
+		\ccode{address} & Arduino's I$2$C address. \\
+		\ccode{aux1}    & 1st MSB: Desk occupancy state ($1$ for occupied, $0$ for free). \\
+		                & next 7 bits, led duty cycle, unsigned integer from $0$ to $100$. \\
+		\ccode{aux2}    & Illuminance lower bound (presumably $40$ or $80$), in LUX. \\
+		\ccode{value[0]}& Measured illuminance, in LUX. \\
+		\ccode{value[1]}& Local background illuminance, in LUX. \\
+		\ccode{value[2]}& Instantaneous control illuminance reference, in LUX. \\
+		\ccode{value[3]}& Instantaneous power consumption, units to be defined. \\
+		\bottomrule
+	\end{tabular}
 \end{table}
 
 Note, to extract the duty cycle and occupancy state, you can do:
-\begin{minted}[]{c}
+\begin{minted}[linenos=false,frame=none]{c}
   unsigned duty_cycle = aux1 & (0x7F); // This is a bit-wise and with 0111111
   bool state = aux1 & (0x80); // This is a bit-wise and with 10000000 
 \end{minted}
