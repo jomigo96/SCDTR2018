@@ -105,12 +105,23 @@ inline void send_sample_time_data(const byte &address, const int &dimming, const
 
 inline void send_consensus_iteration_data(const float& d1, const float& d2, const byte &address){
 
+#ifdef TIMING
+  long t1, t2;
+  t1 = micros();
+#endif
+
 	message.address = address;
 	message.code = consensus_data;
 	message.value[0] = d1;
 	message.value[1] = d2;
 
   send_message();
+
+#ifdef TIMING
+  t2 = micros();
+  Serial.print("Data-forwarding time taken (micros): ");
+  Serial.println(t2-t1);
+#endif
 }
 
 

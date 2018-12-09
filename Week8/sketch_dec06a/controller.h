@@ -3,8 +3,8 @@
 
 #include "Arduino.h"
 
-extern float K11, K21, K22, K12, o1, o2;
-extern const float c1, c2;
+extern float K11, K12, o1;
+extern const float c1;
 extern const int sensor_pin, led_pin;
 
 
@@ -123,7 +123,9 @@ public:
 	}
 
 	void consensus_iteration(){
-	
+		
+		const float k11 = K11/100;
+		const float k12 = K12/100;
 		float z1, z2;
 		float cost_best = 1e20;
 		float d1_best = -1;
@@ -132,8 +134,8 @@ public:
 		float cost;
 		float n;
 
-		z1 = rho*d1_av/100.0-y1-c1;
-		z2 = rho*d2_av/100.0-y2;
+		z1 = rho*d1_av-y1-c1;
+		z2 = rho*d2_av-y2;
 
 		// Unconstrained
 		d1_sol = 1/rho*z1;
@@ -148,9 +150,9 @@ public:
 		}	
 
 		// constrained to linear boundary
-		n = pow(K11,2)+pow(K12,2);
-		d1_sol = 1/rho*z1 - K11/n * (o1-l_bound+(z1*K11+z2*K12));
-		d2_sol = 1/rho*z2 - K12/n * (o1-l_bound+(z1*K11+z2*K12));
+		n = pow(k11,2)+pow(k12,2);
+		d1_sol = 1/rho*z1 - k11/n * (o1-l_bound+(z1*k11+z2*k12)/rho);
+		d2_sol = 1/rho*z2 - k12/n * (o1-l_bound+(z1*k11+z2*k12)/rho);
 		if(this->check_feasibility(d1_sol, d2_sol)){
 			cost = this->evaluate_cost(d1_sol, d2_sol);
 			if(cost < cost_best){
@@ -173,7 +175,7 @@ public:
 		}
 
 		// constrained to 100 boundary
-		d1_sol = 1;
+		d1_sol = 100;
 		d2_sol = z2/rho;
 		if(this->check_feasibility(d1_sol, d2_sol)){
 			cost = this->evaluate_cost(d1_sol, d2_sol);
@@ -186,7 +188,7 @@ public:
 
 		// constrained to linear and 0 boundary
 		d1_sol = 0;
-		d2_sol = (o1-l_bound)/K12;
+		d2_sol = (o1-l_bound)/k12;
 		if(this->check_feasibility(d1_sol, d2_sol)){
 			cost = this->evaluate_cost(d1_sol, d2_sol);
 			if(cost < cost_best){
@@ -197,8 +199,8 @@ public:
 		}
 
 		// constrained to linear and 100 boundary
-		d1_sol = 1;
-		d2_sol = (o1-l_bound+K11);
+		d1_sol = 100;
+		d2_sol = (o1-l_bound+100*k11);
 		if(this->check_feasibility(d1_sol, d2_sol)){
 			cost = this->evaluate_cost(d1_sol, d2_sol);
 			if(cost < cost_best){
@@ -214,8 +216,8 @@ public:
 
 	void get_dimmings(float &dd1, float &dd2){
 	
-		dd1 = d1;
-		dd2 = d2;
+		dd1 = d1/100.0;
+		dd2 = d2/100.0;
 	}
 
 	void set_lower_bound(const float& lower_bound){
@@ -225,8 +227,8 @@ public:
 
 	void update(const float& d1o, const float& d2o){
 	
-		d1_av = (d1+d1o)/2.0;
-		d2_av = (d2+d2o)/2.0;
+		d1_av = (d1+d1o*100)/2.0;
+		d2_av = (d2+d2o*100)/2.0;
 		y1 = y1 + rho*(d1-d1_av);
 		y2 = y2 + rho*(d2-d2_av);
 	}
@@ -234,13 +236,13 @@ public:
 private:
 
 	bool check_feasibility(const float& d1_s, const float& d2_s){
-		const float tol = 0.001;
+		const float tol = 0.01;
 
 		if(d1_s < 0)
 			return false;
 		if(d2_s > 100)
 			return false;
-		return !(d1_s*K11 + d2_s*K12 < l_bound-o1-tol);
+		return (d1_s*K11/100 + d2_s*K12/100 > l_bound-o1-tol);
 	}
 
 	float evaluate_cost(const float& dd1, const float& dd2){

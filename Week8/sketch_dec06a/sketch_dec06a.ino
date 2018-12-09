@@ -2,6 +2,7 @@
 #define DEBUG
 #define SUPRESS_LUX
 //#define DEBUG_MSG
+//#define TIMING
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include "comms.h"
@@ -19,11 +20,12 @@ int dimming = 0;
 volatile byte isr_flag=0;
 
 // I2C
-
 #ifdef NODE1
 const byte own_address = 0x01; 
+const float c1=1;
 #else
 const byte own_address = 0x09;
+const float c1=1;
 #endif
 
 message_t message; // maybe these need to be volatile?
@@ -33,22 +35,17 @@ byte message_received = false;
 const int sensor_pin = 0;
 
 // Control
-float K21 = 1;
-float K12 = 1;
-float K11 = 200;
-float K22 = 200;
-float o1 = 0; // Background illuminance levels
-float o2 = 0;
 float target, L;
-const float c1=1, c2=1;
 float d1, d2;
 const float tol = 0.1;
 byte flag_updated = 1;
 
 #ifdef NODE1
 Controller controller = Controller(5.8515, -0.9355, 10000, 1e-6);
+float K11=326.84, K22=411.81, K12=92.72, K21=109.37, o1=4.88, o2=6.82; //Typical values
 #else
 Controller controller = Controller(7.3250, -1.4760, 10000, 1e-6);
+float K22=326.84, K11=411.81, K21=92.72, K12=109.37, o2=4.88, o1=6.82; //Typical values
 #endif
 
 int lower_bound = 80;
@@ -103,7 +100,7 @@ void setup() {
   
 #endif
 
-	run_calibration(0);
+	//run_calibration(0);
 
 }
 
@@ -116,15 +113,15 @@ void loop() {
 
 		message_received = false;
 
-		if(message.code == calibration_request)
-			run_calibration(1);
+		if(message.code == calibration_request){
+			//run_calibration(1);
+		}
 
 		if(message.code == consensus_data){
 			controller.update(message.value[1], message.value[0]);
 			flag_updated = 1;
 		}
 	}
-
 	//controller.set_lower_bound(80);
 	if(flag_updated){
 		flag_updated=0;
@@ -137,17 +134,17 @@ void loop() {
 		Serial.println(d1);
 		Serial.print("d2=");
 		Serial.println(d2);
+    target = o1 + K11*d1 + K12*d2;
+    Serial.print("Target=");
+    Serial.println(target);
 #endif
 	
 
-		target = o1 + K11*d1 + K12*d2;
-		if(target < 80){
-			Serial.println("Something wrong");
-			target = 80;
-      delay(5000);
-		}
+		
+
 	}
 
+	/*
 	if(isr_flag){
 		isr_flag=0;
 
@@ -155,4 +152,5 @@ void loop() {
 
 		//send_sample_time_data(own_address, dimming, lower_bound, L, o1, target, c1);
 	}
+	*/
 }
