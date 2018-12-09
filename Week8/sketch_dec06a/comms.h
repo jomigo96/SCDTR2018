@@ -43,7 +43,7 @@ void receiveEvent(int c){ //Function that is called when a I2C message is receiv
 	
 	message_received=true; 
 
-#ifdef DEBUG
+#ifdef DEBUG_MSG
 	Serial.println("Incoming message:");
 	Serial.println(message.code);
 	Serial.println(message.address);
@@ -61,7 +61,7 @@ void send_message(){
 	Wire.beginTransmission(0);
 	Wire.write((char*)&message, sizeof(message_t));
 	Wire.endTransmission();
-#ifdef DEBUG
+#ifdef DEBUG_MSG
 	Serial.println("Outgoing message:");
 	Serial.println(message.code);
 	Serial.println(message.address);
@@ -101,5 +101,17 @@ inline void send_sample_time_data(const byte &address, const int &dimming, const
 	Serial.println(t2-t1);
 #endif
 }
+
+
+inline void send_consensus_iteration_data(const float& d1, const float& d2, const byte &address){
+
+	message.address = address;
+	message.code = consensus_data;
+	message.value[0] = d1;
+	message.value[1] = d2;
+
+  send_message();
+}
+
 
 #endif

@@ -1,5 +1,7 @@
-#define NODE
+#define NODE1
+#define DEBUG
 #define SUPRESS_LUX
+//#define DEBUG_MSG
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include "comms.h"
@@ -38,7 +40,10 @@ float K22 = 200;
 float o1 = 0; // Background illuminance levels
 float o2 = 0;
 float target, L;
-float c1=1, c2=1;
+const float c1=1, c2=1;
+float d1, d2;
+const float tol = 0.1;
+byte flag_updated = 1;
 
 #ifdef NODE1
 Controller controller = Controller(5.8515, -0.9355, 10000, 1e-6);
@@ -113,16 +118,41 @@ void loop() {
 
 		if(message.code == calibration_request)
 			run_calibration(1);
+
+		if(message.code == consensus_data){
+			controller.update(message.value[1], message.value[0]);
+			flag_updated = 1;
+		}
+	}
+
+	//controller.set_lower_bound(80);
+	if(flag_updated){
+		flag_updated=0;
+		controller.consensus_iteration();
+		controller.get_dimmings(d1, d2);
+		send_consensus_iteration_data(d1, d2, own_address);
+	
+#ifdef DEBUG
+		Serial.print("d1=");
+		Serial.println(d1);
+		Serial.print("d2=");
+		Serial.println(d2);
+#endif
+	
+
+		target = o1 + K11*d1 + K12*d2;
+		if(target < 80){
+			Serial.println("Something wrong");
+			target = 80;
+      delay(5000);
+		}
 	}
 
 	if(isr_flag){
 		isr_flag=0;
 
-		target = lower_bound;
-
-
 		controller.PID_control(target, dimming, L);
 
-		send_sample_time_data(own_address, dimming, lower_bound, L, o1, target, c1);
+		//send_sample_time_data(own_address, dimming, lower_bound, L, o1, target, c1);
 	}
 }
