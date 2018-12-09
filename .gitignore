@@ -40,4 +40,5 @@
 
 # vim auxiliary files
 *.*~
+*~
 *.swp
