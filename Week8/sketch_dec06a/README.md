@@ -30,4 +30,7 @@ The LDR corresponding node 2 was loosely calibrated at home. The new values are:
 
 #define SUPRESS_LUX
 // The PID controller does not output the LUX value to the serial monitor
+
+#define DEBUG_MSG
+// Debug information about outgoing and incomming messages
 ```
