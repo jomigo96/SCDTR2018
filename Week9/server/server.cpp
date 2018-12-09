@@ -40,13 +40,15 @@ class Server {
 	private:
 		vector<char> command_val = {'g','r','b','s'};
 		vector<char> g_val = {'l','d','s','L','o','r','p','t','e','c','v'};
+		vector<char> bs_val = {'l','d'};
 
 		double g_desk(char, int);
+		desk get_total();
 	public:
 		vector<desk> desks;
 		desk desk1;
 
-		void init_desks(); // Placeholder with example initial values
+		void init_desks();
 		string clmessage(string);
 };
 
@@ -55,6 +57,7 @@ class Server {
 void Server::init_desks(){
 	desk new_desk;
 
+	/* Create DESKCOUNT desks with the same initial values */
 	for(int i = 0; i < DESKCOUNT; i++){
 		new_desk.illuminance = 500;
 		new_desk.duty_cycle = 1;
@@ -89,39 +92,55 @@ string Server::clmessage(string message_in){
 
 	// Check for number of arguments
 	if(args.size() > 3 || args.size() < 1)
-		return "Error processing arguments.";
+		return "error";
 
 	// Check size of first two arguments and convert them to chars
 	if(args[0].size() == 1){
 		const char *c = args[0].c_str();
 		command[0] = c[0];
 	} else
-		return "Error processing arguments.";
+		return "error - c";
 	if(args[1].size() == 1){
 		const char *d = args[1].c_str();
 		command[1] = d[0];
 	} else
-		return "Error processing arguments.";
+		return "error - arg";
 
 	// Check if last argument is a valid desk
+	// Use 0 as the equivalent of T (so all desks instead of just one)?
 	command_desk = std::stoi(args[2], nullptr, 10);
-	if(command_desk <= 0 && command_desk > 2)
-		return "Invalid desk ID.";
+	if(command_desk < 0 && command_desk > 2)
+		return "error - desk";
 
-	// Check if first argument is valid (i.e. belongs to a list of valid arguments)
+	// Check if arguments is valid (i.e. belong to a list of valid arguments)
 	if(std::find(command_val.begin(), command_val.end(), command[0]) != command_val.end()){
 		switch(command[0]){
 			case 'g':
 				if(std::find(g_val.begin(), g_val.end(), command[1]) != g_val.end()){
 					res_val = g_desk(command[1], command_desk - 1);
+
+					// Format output string for g commands
+					std::ostringstream output;
+					output << command[1] << ' ' << command_desk << ' ' << res_val;
+					return output.str();
 				}
+				break;
+			case 'r':
+				return "ack";
+				// Enter value reset and calibration code possibly method
+				break;
+			case 'b':
+				return "b <x> <i>";
+				// Enter last minute buffer code or method
+				break;
+			case 's':
+				return "ack";
+				// Enter stop stream code or method
+				break;
 		}
 	}
 	else
-		return "Error processing arguments.";
-
-
-	return "Success returning arguments!";
+		return "error - c/arg";
 }
 
 /* Method to obtain and return the data corresponding to any
@@ -153,6 +172,19 @@ double Server::g_desk(char arg, int desk){
 		default:
 			return 0;
 	}
+}
+
+/* Method to return a desk struct with the totals of all saved desk structs */
+desk Server::get_total(){
+	desk desk_total;
+	for(auto i : desks){
+		desk_total.power += i.power;
+		desk_total.energy_acc += i.energy_acc;
+		desk_total.comfort_error_acc += i.comfort_error_acc;
+		desk_total.comfort_flicker_acc += i.comfort_flicker_acc;
+	}
+
+	return desk_total;
 }
 
 int main(void){
