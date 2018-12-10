@@ -20,6 +20,7 @@ using std::stringstream;
  * Contains the necessary stored variables
  * All cummulative variables are counted since the last restart */
 typedef struct desk{
+	int ID;
 	double illuminance;
 	double duty_cycle;
 	double occupancy; // Boolean (type double to uniformize functions)
@@ -32,6 +33,26 @@ typedef struct desk{
 	double comfort_error_acc; // Accumulated comfort error
 	double comfort_flicker_acc;
 } desk;
+
+/* Struct to assist the above struct in defining the identity of the message received */
+enum MsgCode : uint8_t{
+	calibration_request,
+	data,
+	cont,
+	acknowledge,
+	consensus_data,
+	sampling_time_data,
+};
+
+/* Message struct defined in the Arduino code
+ * This should be the input from I2C */
+typedef struct msg{
+	MsgCode code; // 1 byte
+	uint8_t address; // 1 byte
+	uint8_t aux1; // 1 byte
+	uint8_t aux2; // 1 byte
+	float value[4]; // 4 x 4 = 16 bytes
+}message_t; //size fixed to 20 bytes
 
 /* Main server class
  * Contains desk data in a vector of desk structs (defined in this file)
@@ -50,6 +71,7 @@ class Server {
 
 		void init_desks();
 		string clmessage(string);
+		void desk_input(message_t);
 };
 
 /* Initializes desk structs with arbitrary values
@@ -59,6 +81,7 @@ void Server::init_desks(){
 
 	/* Create DESKCOUNT desks with the same initial values */
 	for(int i = 0; i < DESKCOUNT; i++){
+		new_desk.ID = i + 1;
 		new_desk.illuminance = 500;
 		new_desk.duty_cycle = 1;
 		new_desk.occupancy = 0;
@@ -141,6 +164,8 @@ string Server::clmessage(string message_in){
 	}
 	else
 		return "error - c/arg";
+	
+	return "error - unknown";
 }
 
 /* Method to obtain and return the data corresponding to any
@@ -185,6 +210,11 @@ desk Server::get_total(){
 	}
 
 	return desk_total;
+}
+
+/* Method to parse an input message from an Arduino desk source */
+void Server::desk_input(message_t message_in){
+	//cout << "Hello!" << endl;
 }
 
 int main(void){
