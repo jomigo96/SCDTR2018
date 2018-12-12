@@ -1,5 +1,8 @@
-#define NODE
+#define NODE1
+#define DEBUG
 #define SUPRESS_LUX
+//#define DEBUG_MSG
+//#define TIMING
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include "comms.h"
@@ -17,33 +20,32 @@ int dimming = 0;
 volatile byte isr_flag=0;
 
 // I2C
-
 #ifdef NODE1
 const byte own_address = 0x01; 
 #else
 const byte own_address = 0x09;
 #endif
 
-message_t message; // maybe these need to be volatile?
+message_t out_message, inc_message; // maybe these need to be volatile?
 byte message_received = false; 
 
 // LDR 
 const int sensor_pin = 0;
 
 // Control
-float K21 = 1;
-float K12 = 1;
-float K11 = 200;
-float K22 = 200;
-float o1 = 0; // Background illuminance levels
-float o2 = 0;
 float target, L;
-float c1=1, c2=1;
+float d1, d2;
+const float tol = 0.1;
+byte flag_updated = 1;
 
 #ifdef NODE1
 Controller controller = Controller(5.8515, -0.9355, 10000, 1e-6);
+float K11=326.84, K22=411.81, K12=92.72, K21=109.37, o1=4.88, o2=6.82; //Typical values
+const float c1=5;
 #else
 Controller controller = Controller(7.3250, -1.4760, 10000, 1e-6);
+float K22=326.84, K11=411.81, K21=92.72, K12=109.37, o2=4.88, o1=6.82; //Typical values
+const float c1=1;
 #endif
 
 int lower_bound = 80;
@@ -94,9 +96,9 @@ void setup() {
   Serial.println("This is node 1");
 #else
   Serial.println("This is node 2");
-#endif
+#endif 
   
-#endif
+#endif 
 
 	run_calibration(0);
 
@@ -111,18 +113,67 @@ void loop() {
 
 		message_received = false;
 
-		if(message.code == calibration_request)
+		if(inc_message.code == calibration_request){
 			run_calibration(1);
+			controller.reset_consensus(lower_bound);
+      flag_updated=1;
+		}
+
+		if(inc_message.code == consensus_data){
+			flag_updated = controller.update(inc_message.value[1], inc_message.value[0]);
+			if(!flag_updated){
+				controller.get_dimmings(d1, d2);
+				target = o1 + K11*d1/100.0 + K12*d2/100.0;
+				out_message.code = consensus_stop;
+				send_message();
+#ifdef DEBUG
+				Serial.println("Consensus converged");
+				Serial.print("d1=");
+				Serial.println(d1);
+				Serial.print("d2=");
+				Serial.println(d2);
+#endif
+			}
+		}
+		if(inc_message.code == consensus_stop){
+			controller.get_dimmings(d1, d2);
+			target = o1 + K11*d1/100.0 + K12*d2/100.0;
+			inc_message.code = none;
+#ifdef DEBUG
+			Serial.println("Consensus converged");
+			Serial.print("d1=");
+			Serial.println(d1);
+			Serial.print("d2=");
+			Serial.println(d2);
+#endif
+		}
 	}
 
+	// Consensus iteration
+	if(flag_updated){
+		flag_updated=0;
+		controller.consensus_iteration();
+		controller.get_dimmings(d1, d2);
+		send_consensus_iteration_data(d1, d2, own_address);
+	
+#ifdef DEBUG
+		Serial.print("d1av=");
+		Serial.println(d1);
+		Serial.print("d2av=");
+		Serial.println(d2);
+#endif
+
+		target = o1 + K11*d1/100.0 + K12*d2/100.0;
+	}
+
+	/*
+	// Controller
 	if(isr_flag){
 		isr_flag=0;
 
-		target = lower_bound;
-
-
 		controller.PID_control(target, dimming, L);
 
-		send_sample_time_data(own_address, dimming, lower_bound, L, o1, target, c1);
+		//send_sample_time_data(own_address, dimming, lower_bound, L, o1, target, c1);
 	}
+	*/
 }

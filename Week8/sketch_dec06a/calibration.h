@@ -9,7 +9,7 @@ extern float K21, K12, K11, K22, o1, o2;
 extern volatile byte isr_flag;
 extern byte message_received;
 extern const byte own_address;
-extern message_t message;
+extern message_t inc_message, out_message;
 extern const int sensor_pin, led_pin;
 extern Controller controller;
 
@@ -38,7 +38,6 @@ int run_calibration(int mode){
 	int count=0;
 	bool flag_3s=false;
 	bool flag_other=false;
-	byte flag_calibration = 1;
 	State state = start_cal;
 	float L_other, L;
 	int s;
@@ -62,25 +61,28 @@ int run_calibration(int mode){
 	while(1){
 
 		if(message_received){ 
+      
+      message_received = 0;
 
 			// Handle message
-			if(message.code == calibration_request){
+			if(inc_message.code == calibration_request){
+#ifdef DEBUG
+        Serial.println("Starting calibration as slave");
+#endif
 				state = cal0b;
-		        reset_counter(&count, &flag_3s);
+		    reset_counter(&count, &flag_3s);
 			}
 	
-			if((message.code == data) || (message.code == acknowledge) ||(message.code == cont)){
+			if((inc_message.code == data) || (inc_message.code == acknowledge) ||(inc_message.code == cont)){
 				flag_other = true;
 			}
-	
-			message_received = 0;
 		}
 	
 		switch(state){
 	
 			case start_cal:
-				message.code = calibration_request;
-				message.address = own_address;
+				out_message.code = calibration_request;
+				out_message.address = own_address;
 				send_message();
 				state = cal0;
 				reset_counter(&count, &flag_3s);
@@ -113,8 +115,8 @@ int run_calibration(int mode){
 					L = controller.compute_lux(s);
 					K12 = (L-o1)/(led_on/255.0);
 				
-					message.code = acknowledge;
-					message.address = own_address;
+					out_message.code = acknowledge;
+					out_message.address = own_address;
 					send_message();
 
 					state = cal2;
@@ -139,11 +141,11 @@ int run_calibration(int mode){
 		
 					K11 = (L-o1)/(led_on/255.0);
 		
-					message.code = data;
-					message.value[0] = o1;
-					message.value[1] = K11;
-					message.value[2] = K12;
-					message.address = own_address;
+					out_message.code = data;
+					out_message.value[0] = o1;
+					out_message.value[1] = K11;
+					out_message.value[2] = K12;
+					out_message.address = own_address;
 					send_message();
 #ifdef DEBUG
 					Serial.print("State cal2, LUX =  ");
@@ -155,9 +157,9 @@ int run_calibration(int mode){
 				if(flag_other){
 					flag_other = false;
 
-					o2 = message.value[0];
-					K22 = message.value[1];
-					K21 = message.value[2];
+					o2 = inc_message.value[0];
+					K22 = inc_message.value[1];
+					K21 = inc_message.value[2];
 					
 					state = done;
 
@@ -195,8 +197,8 @@ int run_calibration(int mode){
 		
 					K11 = (L-o1)/(led_on/255.0);
 		
-					message.code = cont;
-					message.address = own_address;
+					out_message.code = cont;
+					out_message.address = own_address;
 					send_message();
 				
 #ifdef DEBUG
@@ -208,7 +210,7 @@ int run_calibration(int mode){
 				}
 				if(flag_other){
 					flag_other = false;
-					if(message.code == acknowledge)
+					if(inc_message.code == acknowledge)
 						state = cal2b;
 				}
 			break;
@@ -223,15 +225,15 @@ int run_calibration(int mode){
 					L = controller.compute_lux(s);
 					K12 = (L-o1)/(led_on/255.0);
 				
-					o2 = message.value[0];
-					K22 = message.value[1];
-					K21 = message.value[2];
+					o2 = inc_message.value[0];
+					K22 = inc_message.value[1];
+					K21 = inc_message.value[2];
 
-					message.address = own_address;
-					message.code = data;
-					message.value[0] = o1;
-					message.value[1] = K11;
-					message.value[2] = K12;
+					out_message.address = own_address;
+					out_message.code = data;
+					out_message.value[0] = o1;
+					out_message.value[1] = K11;
+					out_message.value[2] = K12;
 					send_message();
 
 					state = done;
