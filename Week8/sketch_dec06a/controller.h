@@ -37,7 +37,6 @@ public:
 		d2_av = 0;
 		y1 = 0;
 		y2 = 0;
-		n = 0;
 		l_bound = 80;
 	}
 
@@ -188,7 +187,7 @@ public:
 
 		// constrained to linear and 0 boundary
 		d1_sol = 0;
-		d2_sol = (o1-l_bound)/k12;
+		d2_sol = (l_bound - o1)/k12;
 		if(this->check_feasibility(d1_sol, d2_sol)){
 			cost = this->evaluate_cost(d1_sol, d2_sol);
 			if(cost < cost_best){
@@ -216,8 +215,8 @@ public:
 
 	void get_dimmings(float &dd1, float &dd2){
 	
-		dd1 = d1/100.0;
-		dd2 = d2/100.0;
+		dd1 = d1;
+		dd2 = d2;
 	}
 
 	void set_lower_bound(const float& lower_bound){
@@ -225,12 +224,26 @@ public:
 	}
 
 
-	void update(const float& d1o, const float& d2o){
+	bool update(const float& d1o, const float& d2o){
+
+		const float tolerance = 0.005; //0.5% dimming diference
 	
-		d1_av = (d1+d1o*100)/2.0;
-		d2_av = (d2+d2o*100)/2.0;
+		d1_av = (d1+d1o)/2.0;
+		d2_av = (d2+d2o)/2.0;
 		y1 = y1 + rho*(d1-d1_av);
 		y2 = y2 + rho*(d2-d2_av);
+
+		return !((fabs(d1o-d1_av) < tolerance) && (fabs(d2o-d2_av) < tolerance));
+	}
+
+	void reset_consensus(const float& bound){
+		d1=0;
+		d2=0;
+		d1_av=0;
+		d2_av=0;
+		y1=0;
+		y2=0;
+		l_bound=bound;
 	}
 
 private:
@@ -267,7 +280,6 @@ private:
 	float d1, d2;
 	float d1_av, d2_av;
 	float y1, y2;
-	float n;
 	float l_bound;
 	const float rho;
 };

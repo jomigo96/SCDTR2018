@@ -22,13 +22,11 @@ volatile byte isr_flag=0;
 // I2C
 #ifdef NODE1
 const byte own_address = 0x01; 
-const float c1=1;
 #else
 const byte own_address = 0x09;
-const float c1=1;
 #endif
 
-message_t message; // maybe these need to be volatile?
+message_t out_message, inc_message; // maybe these need to be volatile?
 byte message_received = false; 
 
 // LDR 
@@ -43,9 +41,11 @@ byte flag_updated = 1;
 #ifdef NODE1
 Controller controller = Controller(5.8515, -0.9355, 10000, 1e-6);
 float K11=326.84, K22=411.81, K12=92.72, K21=109.37, o1=4.88, o2=6.82; //Typical values
+const float c1=5;
 #else
 Controller controller = Controller(7.3250, -1.4760, 10000, 1e-6);
 float K22=326.84, K11=411.81, K21=92.72, K12=109.37, o2=4.88, o1=6.82; //Typical values
+const float c1=1;
 #endif
 
 int lower_bound = 80;
@@ -96,11 +96,11 @@ void setup() {
   Serial.println("This is node 1");
 #else
   Serial.println("This is node 2");
-#endif
+#endif 
   
-#endif
+#endif 
 
-	//run_calibration(0);
+	run_calibration(0);
 
 }
 
@@ -113,16 +113,43 @@ void loop() {
 
 		message_received = false;
 
-		if(message.code == calibration_request){
-			//run_calibration(1);
+		if(inc_message.code == calibration_request){
+			run_calibration(1);
+			controller.reset_consensus(lower_bound);
+      flag_updated=1;
 		}
 
-		if(message.code == consensus_data){
-			controller.update(message.value[1], message.value[0]);
-			flag_updated = 1;
+		if(inc_message.code == consensus_data){
+			flag_updated = controller.update(inc_message.value[1], inc_message.value[0]);
+			if(!flag_updated){
+				controller.get_dimmings(d1, d2);
+				target = o1 + K11*d1/100.0 + K12*d2/100.0;
+				out_message.code = consensus_stop;
+				send_message();
+#ifdef DEBUG
+				Serial.println("Consensus converged");
+				Serial.print("d1=");
+				Serial.println(d1);
+				Serial.print("d2=");
+				Serial.println(d2);
+#endif
+			}
+		}
+		if(inc_message.code == consensus_stop){
+			controller.get_dimmings(d1, d2);
+			target = o1 + K11*d1/100.0 + K12*d2/100.0;
+			inc_message.code = none;
+#ifdef DEBUG
+			Serial.println("Consensus converged");
+			Serial.print("d1=");
+			Serial.println(d1);
+			Serial.print("d2=");
+			Serial.println(d2);
+#endif
 		}
 	}
-	//controller.set_lower_bound(80);
+
+	// Consensus iteration
 	if(flag_updated){
 		flag_updated=0;
 		controller.consensus_iteration();
@@ -130,21 +157,17 @@ void loop() {
 		send_consensus_iteration_data(d1, d2, own_address);
 	
 #ifdef DEBUG
-		Serial.print("d1=");
+		Serial.print("d1av=");
 		Serial.println(d1);
-		Serial.print("d2=");
+		Serial.print("d2av=");
 		Serial.println(d2);
-    target = o1 + K11*d1 + K12*d2;
-    Serial.print("Target=");
-    Serial.println(target);
 #endif
-	
 
-		
-
+		target = o1 + K11*d1/100.0 + K12*d2/100.0;
 	}
 
 	/*
+	// Controller
 	if(isr_flag){
 		isr_flag=0;
 
