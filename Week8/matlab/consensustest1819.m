@@ -16,10 +16,10 @@ K = [k11, k12 ; k21 , k22];
 L1 = 80; o1 = 4.88; L2 = 80; o2 = 6.82;
 
 %symmetric costs
-c1 = 1; c2 = 1; 
+%c1 = 1; c2 = 1; 
 
 %asymmetric costs
-%c1 = 1; c2 = 3;
+c1 = 5; c2 = 1;
 
 
 c = [c1 c2]; 
@@ -30,8 +30,8 @@ o = [o1;o2];
 rho = 0.07;
 %node 1 initialization
 node1.index = 1;
-node1.d = [(L1-o1)/k11;0];
-node1.d_av = [(L1-o1)/k11;0];
+node1.d = [0;0];
+node1.d_av = [0;0];
 node1.y = [0;0];
 node1.k = [k11;k12]; 
 node1.n = norm(node1.k)^2;
@@ -42,8 +42,8 @@ node1.L = L1;
 
 %node 2 initialization
 node2.index = 2;
-node2.d = [0;(L2-o2)/k22];
-node2.d_av = [0;(L2-o2)/k22];
+node2.d = [0;0];
+node2.d_av = [0;0];
 node2.y = [0;0];
 node2.k = [k21;k22]; 
 node2.n = norm(node2.k)^2;
@@ -60,7 +60,8 @@ d22(1) = node2.d(2);
 av1(1) = (d11(1)+d21(1))/2;
 av2(1) = (d12(1)+d22(1))/2;
 %iterations
-for i=2:50
+N=50;
+for i=2:N
    % node 1
    [d1, cost1] = primal_solve(node1, rho);
    node1.d = d1;
@@ -123,7 +124,7 @@ l = K*d+o
 
 %Plots
 figure(10);
-plot(1:50, av1, 1:50, av2, 1:50, d11, 1:50, d12, 1:50, d21, 1:50, d22);
+plot(1:N, av1, 1:N, av2, 1:N, d11, 1:N, d12, 1:N, d21, 1:N, d22);
 legend('av1','av2', 'd11', 'd12', 'd21', 'd22');
 title('time convergence');
 xlabel('iter');
@@ -177,16 +178,18 @@ function [d, cost] = primal_solve(node, rho)
     sol_boundary_100 = 1;
     sol_linear_0 = 1;
     sol_linear_100 = 1;
+    str = '';
     z = rho*node.d_av - node.y;
     z(node.index) = z(node.index) - node.c;
     %unconstrained minimum
     d_u = (1/rho)*z;
     sol_unconstrained = check_feasibility(node,d_u);
     if sol_unconstrained
-        cost_unconstrained = evaluate_cost(node, d_u,rho);
+        cost_unconstrained = evaluate_cost(node, d_u, rho);
         if cost_unconstrained < cost_best
            d = d_u;
            cost = cost_unconstrained;
+           disp('unconstrained');
            return  %IF UNCONSTRAINED SOLUTION EXISTS, THEN IT IS OPTIMAL
                    %NO NEED TO COMPUTE THE OTHER
         end;
@@ -201,6 +204,7 @@ function [d, cost] = primal_solve(node, rho)
         if cost_boundary_linear < cost_best
            d_best = d_bl;
            cost_best = cost_boundary_linear;
+           str = 'linear';
         end;
     end;
     %compute minimum constrained to 0 boundary
@@ -214,6 +218,7 @@ function [d, cost] = primal_solve(node, rho)
         if cost_boundary_0 < cost_best
            d_best = d_b0;
            cost_best = cost_boundary_0;
+           str = '0 boundary';
         end;
     end;
     %compute minimum constrained to 100 boundary
@@ -227,6 +232,7 @@ function [d, cost] = primal_solve(node, rho)
         if cost_boundary_100 < cost_best
            d_best = d_b1;
            cost_best = cost_boundary_100;
+           str = '100 boundary';
         end;
     end;
     % compute minimum constrained to linear and 0 boundary
@@ -242,6 +248,7 @@ function [d, cost] = primal_solve(node, rho)
         if cost_linear_0 < cost_best
            d_best = d_l0;
            cost_best = cost_linear_0;
+           str = 'linear and 0 boundary';
         end;
     end;
     % compute minimum constrained to linear and 100 boundary
@@ -257,9 +264,11 @@ function [d, cost] = primal_solve(node, rho)
         if cost_linear_1 < cost_best
            d_best = d_l1;
            cost_best = cost_linear_1;
+           str = 'linear and 0 boundary';
         end;
     end;
     d = d_best;
     cost = cost_best;
+    disp(str);
 end
     
