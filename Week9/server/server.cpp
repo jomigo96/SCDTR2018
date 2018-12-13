@@ -41,18 +41,20 @@ enum MsgCode : uint8_t{
 	cont,
 	acknowledge,
 	consensus_data,
+	consensus_stop,
 	sampling_time_data,
+	none,
 };
 
 /* Message struct defined in the Arduino code
  * This should be the input from I2C */
 typedef struct msg{
-	MsgCode code; // 1 byte
-	uint8_t address; // 1 byte
-	uint8_t aux1; // 1 byte
-	uint8_t aux2; // 1 byte
-	float value[4]; // 4 x 4 = 16 bytes
-}message_t; //size fixed to 20 bytes
+	MsgCode code;		// 1 byte
+	uint8_t address;	// 1 byte
+	uint8_t aux1;		// 1 byte
+	uint8_t aux2;		// 1 byte
+	float value[4];		// 4 x 4 = 16 bytes
+}message_t;				//size fixed to 20 bytes
 
 /* Main server class
  * Contains desk data in a vector of desk structs (defined in this file)
@@ -117,53 +119,65 @@ string Server::clmessage(string message_in){
 	if(args.size() > 3 || args.size() < 1)
 		return "error";
 
-	// Check size of first two arguments and convert them to chars
+	// Check that command is a string of one character and converts to char
 	if(args[0].size() == 1){
 		const char *c = args[0].c_str();
 		command[0] = c[0];
 	} else
 		return "error - c";
-	if(args[1].size() == 1){
-		const char *d = args[1].c_str();
-		command[1] = d[0];
-	} else
-		return "error - arg";
 
-	// Check if last argument is a valid desk
-	// Use 0 as the equivalent of T (so all desks instead of just one)?
-	command_desk = std::stoi(args[2], nullptr, 10);
-	if(command_desk < 0 && command_desk > 2)
-		return "error - desk";
+	// Checks for commands with arguments
+	if(args.size() > 1){
+		// Check that first argument is a string of one character and converts to char
+		if(args[1].size() == 1){
+			const char *d = args[1].c_str();
+			command[1] = d[0];
+		} else
+			return "error - arg";
+
+		// Check if last argument is a valid desk
+		// Use 0 as the equivalent of T (so all desks instead of just one)?
+		command_desk = std::stoi(args[2], nullptr, 10);
+		if(command_desk < 0 && command_desk > 2)
+			return "error - desk";
+	}
 
 	// Check if arguments is valid (i.e. belong to a list of valid arguments)
 	if(std::find(command_val.begin(), command_val.end(), command[0]) != command_val.end()){
-		switch(command[0]){
-			case 'g':
-				if(std::find(g_val.begin(), g_val.end(), command[1]) != g_val.end()){
-					res_val = g_desk(command[1], command_desk - 1);
-
-					// Format output string for g commands
-					std::ostringstream output;
-					output << command[1] << ' ' << command_desk << ' ' << res_val;
-					return output.str();
-				}
-				break;
-			case 'r':
+		if(args.size() != 3){
+			if(command[0] == 'r'){
 				return "ack";
 				// Enter value reset and calibration code possibly method
-				break;
-			case 'b':
-				return "b <x> <i>";
-				// Enter last minute buffer code or method
-				break;
-			case 's':
-				return "ack";
-				// Enter stop stream code or method
-				break;
+			} else
+				return "error - arg nums";
+		} else {
+			//////////////////////////////////////////////
+			// Enter desk ID validity (argument 2) here //
+			//////////////////////////////////////////////
+			switch(command[0]){
+				case 'g':
+					if(std::find(g_val.begin(), g_val.end(), command[1]) != g_val.end()){
+						res_val = g_desk(command[1], command_desk - 1);
+						
+						// Format output string for g commands
+						std::ostringstream output;
+						output << command[1] << ' ' << command_desk << ' ' << res_val;
+						return output.str();
+					}
+					break;
+				case 'b':
+					return "b <x> <i>";
+					// Enter last minute buffer code or method
+					break;
+				case 's':
+					return "ack";
+					// Enter stop stream code or method
+					break;
+			}
 		}
 	}
 	else
-		return "error - c/arg";
+		return "error - c";
 	
 	return "error - unknown";
 }
