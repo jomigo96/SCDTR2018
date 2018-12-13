@@ -1,15 +1,15 @@
-# Calibration code
+# Complete Arduino code
 
 Code is modularized as:
 
 + `sketch_nov15a.ino` - main setup and loop.
 + `comms.h` - contains the communication protocols.
-+ `controller.h` - contains a C++ class which wich will later be the controller
++ `controller.h` - contains a C++ class to perform both the PID controller and the consensus algorithm.
 + `calibration.h` - Contains the calibration function, which is called on setup.
 
 ## LDR parameters
 
-Code is the same for every node, however, each LDR has its own b and m parameters. These are loaded apropriately by defining or the `NODE1` macro in the begining of the code, like:
+Code is the same for every node, however, each LDR has its own `b` and `m` parameters. These are loaded apropriately by defining or the `NODE1` macro in the begining of the code, like:
 ```C
 #define NODE1
 ```
@@ -29,8 +29,11 @@ The LDR corresponding node 2 was loosely calibrated at home. The new values are:
 // Lots of debug messages thrown to the Serial Monitor
 
 #define SUPRESS_LUX
-// The PID controller does not output the LUX value to the serial monitor
+// The PID controller does not output the LUX value to the serial monitor.
 
 #define DEBUG_MSG
-// Debug information about outgoing and incomming messages
+// Debug information about outgoing and incomming messages.
+
+#define TIMING
+// Prints time taken in PID control, or message forwarding.
 ```

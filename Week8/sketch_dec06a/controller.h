@@ -49,7 +49,7 @@ public:
 		return pow(10, (log10(R)-b)/m );
 
 	}
-	void PID_control(const float &target, int &dimming, float &L){
+	void PID_control(const float &target, const float& d, int * dimming, float * L){
 	
 		int s1, s2, s3;
 		float v, ff, R, value, Ltarget;
@@ -78,16 +78,16 @@ public:
 		s3 = analogRead(sensor_pin);
 		v = median(s1, s2, s3) * 5.0/1.0230;
 		R = (5-v/1000.0)/(v/1000.0/Raux);
-		L = pow(10, (log10(R)-b)/m );
+		*L = pow(10, (log10(R)-b)/m );
 
-	    //Feed-forward gain
-		ff = (target-o1) / K11 * 255.0;
+	    //Feed-forward term
+		ff = d*255.0;
 
 	    //Simulator
 		Ltarget = target - (target - old_value)*exp(-t/((R+Raux)*C));
 
 	    //Feed-back
-		error = deadzone(Ltarget - L, epsilon);
+		error = deadzone(Ltarget - *L, epsilon);
 		integral = integral + h/2.0*(error + error_keep);
 		u += (integral*KI + error)*KP;
 
@@ -103,7 +103,7 @@ public:
 
 		//Clean-up
 #ifndef SUPRESS_LUX
-		Serial.println(L);
+		Serial.println(*L);
 #endif
 		t += h;
 	    
@@ -118,7 +118,7 @@ public:
 	    
 		error_keep = error;
 
-		dimming = round(saturation(value)/255.0*100.0); // Dimming, 0-100
+		*dimming = round(saturation(value)/255.0*100.0); // Dimming, 0-100
 	}
 
 	void consensus_iteration(){

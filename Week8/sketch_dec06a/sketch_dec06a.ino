@@ -17,7 +17,9 @@ const int led_pin = 3;
 int dimming = 0;
 
 // Interupts
-volatile byte isr_flag=0;
+volatile byte isr_flag = 0;
+const int pin_switch = 2;
+uint32_t debouncer = 0;
 
 // I2C
 #ifdef NODE1
@@ -31,6 +33,8 @@ byte message_received = false;
 
 // LDR 
 const int sensor_pin = 0;
+const int lux_high = 250;
+const int lux_low = 120;
 
 // Control
 float target, L;
@@ -41,14 +45,14 @@ byte flag_updated = 1;
 #ifdef NODE1
 Controller controller = Controller(5.8515, -0.9355, 10000, 1e-6);
 float K11=326.84, K22=411.81, K12=92.72, K21=109.37, o1=4.88, o2=6.82; //Typical values
-const float c1=5;
+const float c1=1;
 #else
 Controller controller = Controller(7.3250, -1.4760, 10000, 1e-6);
 float K22=326.84, K11=411.81, K21=92.72, K12=109.37, o2=4.88, o1=6.82; //Typical values
 const float c1=1;
 #endif
 
-int lower_bound = 80;
+int lower_bound = lux_high;
 
 
 
@@ -60,6 +64,26 @@ ISR(TIMER1_COMPA_vect){
 	isr_flag=true;
 }
 
+void switch_isr(){
+	// Debouncing 
+	if(debouncer < 200)
+		return;
+	debouncer = 0;
+
+	if(lower_bound == lux_low){
+		lower_bound = lux_high;
+		controller.reset_consensus(lux_high);
+	}else{
+		lower_bound = lux_low;
+		controller.reset_consensus(lux_low);
+	}
+	flag_updated = 1;
+
+#ifdef DEBUG
+	Serial.print("Lower bound set to: ");
+	Serial.println(lower_bound);
+#endif
+}
 
 /**************************************************************************/
 // Setup
@@ -86,6 +110,10 @@ void setup() {
 	Wire.begin(own_address);
 	Wire.onReceive(receiveEvent); //Signals that receiveEvent() should be called when a message is received
 	TWAR |= 1; //Enable reception of broadcasts
+
+	// Occupation toggle button
+	pinMode(pin_switch, INPUT_PULLUP);
+	attachInterrupt(digitalPinToInterrupt(pin_switch), switch_isr, FALLING);
   
 	Serial.begin(230400);
 
@@ -116,7 +144,7 @@ void loop() {
 		if(inc_message.code == calibration_request){
 			run_calibration(1);
 			controller.reset_consensus(lower_bound);
-      flag_updated=1;
+			flag_updated=1;
 		}
 
 		if(inc_message.code == consensus_data){
@@ -137,7 +165,6 @@ void loop() {
 		}
 		if(inc_message.code == consensus_stop){
 			controller.get_dimmings(d1, d2);
-			target = o1 + K11*d1/100.0 + K12*d2/100.0;
 			inc_message.code = none;
 #ifdef DEBUG
 			Serial.println("Consensus converged");
@@ -156,24 +183,24 @@ void loop() {
 		controller.get_dimmings(d1, d2);
 		send_consensus_iteration_data(d1, d2, own_address);
 	
-#ifdef DEBUG
+#ifdef DEBUGGY
 		Serial.print("d1av=");
 		Serial.println(d1);
 		Serial.print("d2av=");
 		Serial.println(d2);
 #endif
 
-		target = o1 + K11*d1/100.0 + K12*d2/100.0;
 	}
 
-	/*
 	// Controller
 	if(isr_flag){
 		isr_flag=0;
 
-		controller.PID_control(target, dimming, L);
+		target = o1 + K11*d1/100.0 + K12*d2/100.0;
+		target = (target >= lower_bound) ? target : lower_bound;
+		controller.PID_control(target, d1/100.0, &dimming, &L);
 
-		//send_sample_time_data(own_address, dimming, lower_bound, L, o1, target, c1);
+		send_sample_time_data(own_address, dimming, lower_bound, L, o1, target, c1);
+    debouncer++;
 	}
-	*/
 }

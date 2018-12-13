@@ -15,7 +15,7 @@ enum MsgCode : uint8_t{
 	consensus_data,
 	consensus_stop,
 	sampling_time_data,
-  none,
+	none,
 
 };
 
@@ -41,6 +41,8 @@ void receiveEvent(int c){ //Function that is called when a I2C message is receiv
 		buf[i]=Wire.read();
 		i++;
 	}
+	if((uint8_t)buf[0] == sampling_time_data)
+		return; // No need for this
 
 	memcpy(&inc_message, buf, sizeof(message_t)); 
 	
@@ -106,7 +108,8 @@ inline void send_sample_time_data(const byte &address, const int &dimming, const
 }
 
 
-inline void send_consensus_iteration_data(const float& d1, const float& d2, const byte &address){
+inline void send_consensus_iteration_data(const float& d1, const float& d2,
+			   	const byte &address){
 
 #ifdef TIMING
 	long t1, t2;
@@ -122,7 +125,7 @@ inline void send_consensus_iteration_data(const float& d1, const float& d2, cons
 
 #ifdef TIMING
 	t2 = micros();
-	Serial.print("Data-forwarding time taken (micros): ");
+	Serial.print("Consensus forwarding time taken (micros): ");
 	Serial.println(t2-t1);
 #endif
 }
