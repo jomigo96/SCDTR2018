@@ -1,7 +1,7 @@
 #include "Session.hpp"
 
 Session::Session(boost::asio::io_service& ios):
-	sock(ios){}
+	ios(ios), sock(ios), write_strand(ios){}
 
 Session::~Session(){}
 
@@ -10,14 +10,16 @@ tcp::socket& Session::get_socket(){
 	return sock;
 }
 
-void Session::handle_write(std::shared_ptr<Session>& s, const boost::system::error_code& err){
+void Session::handle_write(std::shared_ptr<Session>& s, const boost::system::error_code& err, size_t n){
 	if(!err){
-	    sock.async_read_some(
-	        boost::asio::buffer(data, DATA_SIZE),
-	        boost::bind(&Session::handle_read, this,
-	                    shared_from_this(),
-	                    boost::asio::placeholders::error,
-	                    boost::asio::placeholders::bytes_transferred));
+		std::cout << "Sent " << n << " bytes" << std::endl;
+	    boost::asio::async_read_until(sock,
+	        						in_buf,
+									'\n',
+	        						boost::bind(&Session::handle_read, this,
+	                    						shared_from_this(),
+	                    						boost::asio::placeholders::error,
+	                    						boost::asio::placeholders::bytes_transferred));
 	    }else{
 	    	std::cerr << "Error: " << err.message() << std::endl;
 			s.reset();
@@ -27,13 +29,11 @@ void Session::handle_write(std::shared_ptr<Session>& s, const boost::system::err
 void Session::handle_read(std::shared_ptr<Session>& s, const boost::system::error_code& err, size_t byte_n){
 
 	if(!err){
-		data[byte_n] = '\0';
-		if(byte_n > 0)
-			data[byte_n-1] = (data[byte_n-1] == '\n') ? ' ' : data[byte_n-1]; //remove newline if it exists
-		std::cout << "Received command \"" << data << "\"" << std::endl;
+
+		std::cout << "Received " << byte_n << " bytes" << std::endl;
 
 		// Parse code
-		std::stringstream message(data);
+		std::istream message(&in_buf);
 		std::vector<std::string> args;
 		std::string buff;
 
@@ -42,18 +42,18 @@ void Session::handle_read(std::shared_ptr<Session>& s, const boost::system::erro
 
 		// check argument count
 		if((args.size() != 1) && (args.size() != 3)){
-			buff = std::string("Invalid command number");
+			out_data = std::string("Invalid command number");
 		}else{
-			buff = this->fetch_data(args);
-			std::cout << "Sending back: " << buff << std::endl;
+			out_data = this->fetch_data(args);
 		}
+		std::cout << "Sending back: " << out_data << std::endl;
+		out_data += '\n';
 
-		boost::asio::async_write(sock,
-								boost::asio::buffer(buff),
-								boost::bind(&Session::handle_write,
-											this,
-											shared_from_this(),
-											boost::asio::placeholders::error));
+		ios.post(write_strand.wrap([me=shared_from_this()]
+								(){
+									me->send_reply();
+								}));
+
 
 	}else{
 		std::cerr << "Error: " << err.message() << std::endl;
@@ -61,13 +61,28 @@ void Session::handle_read(std::shared_ptr<Session>& s, const boost::system::erro
 	}
 }
 
+void Session::send_reply(){
+
+	boost::asio::async_write(sock,
+							boost::asio::buffer(out_data),
+							write_strand.wrap(boost::bind(&Session::handle_write,
+														  this,
+														  shared_from_this(),
+													  	  boost::asio::placeholders::error,
+														  boost::asio::placeholders::bytes_transferred
+													  )));
+
+}
+
 void Session::start(){
-	sock.async_read_some(boost::asio::buffer(data, DATA_SIZE),
-						boost::bind(&Session::handle_read,
-									this,
-									shared_from_this(),
-									boost::asio::placeholders::error,
-									boost::asio::placeholders::bytes_transferred));
+	boost::asio::async_read_until(sock,
+								  in_buf,
+								  '\n',
+								  boost::bind(&Session::handle_read,
+											  this,
+											  shared_from_this(),
+											  boost::asio::placeholders::error,
+											  boost::asio::placeholders::bytes_transferred));
 }
 
 

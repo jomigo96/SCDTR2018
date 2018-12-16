@@ -1,5 +1,5 @@
 CC=g++
-CPPFLAGS=-g -c -std=c++11 -Wall -Wextra -pedantic
+CPPFLAGS=-g -c -std=c++14 -Wall -Wextra -pedantic
 LDFLAGS=-lpthread -lboost_system
 EXECUTABLE=server
 

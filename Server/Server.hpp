@@ -11,14 +11,15 @@ using boost::asio::ip::tcp;
 
 class Server{
 public:
-	Server(boost::asio::io_service& ios, uint16_t port);
+	Server(boost::asio::io_service& ios);
 	~Server();
-
-	void handle_accept(std::shared_ptr<Session> session, const boost::system::error_code& err);
+	void start_sever(uint16_t port);
 
 private:
 	boost::asio::io_service& ios;
 	boost::asio::ip::tcp::acceptor acceptor;
+
+	void handle_accept(std::shared_ptr<Session> session, const boost::system::error_code& err);
 };
 
 

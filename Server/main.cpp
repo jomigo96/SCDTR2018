@@ -36,7 +36,8 @@ int main(){
 
 	try{
 		boost::asio::io_service io;
-		Server ser(io, 8080);
+		Server ser(io);
+		ser.start_sever(8080);
 		io.run();
 
 	}catch(std::exception& e){
