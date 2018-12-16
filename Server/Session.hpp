@@ -18,6 +18,7 @@ using boost::asio::ip::tcp;
 extern std::mutex m;
 extern std::condition_variable cv;
 extern bool ready;
+extern desk_t desks[];
 
 class Session : public std::enable_shared_from_this<Session>{
 

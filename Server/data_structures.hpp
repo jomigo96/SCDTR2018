@@ -2,10 +2,9 @@
 #define DATA_STRUCTURES_HPP
 
 typedef struct desk{
-	int ID;
 	double illuminance;
 	double duty_cycle;
-	double occupancy; // Boolean (type double to uniformize functions)
+	int occupancy; // Boolean (type double to uniformize functions)
 	double illuminance_lb; // Lower-bound
 	double illuminance_bg; // Background
 	double illuminance_ref; // Control reference

@@ -87,55 +87,114 @@ void Session::start(){
 
 
 std::string Session::fetch_data(const std::vector<std::string>& args) const{
+	// I know this swich is ugly af
 	std::stringstream out;
 
 	for(auto it=args.cbegin(); it!=args.cend(); it++){
 		if((*it).size() != 1){
-			return std::string("Invalid command");
+			out << "Invalid command";
+			return out.str();
 		}
 	}
 
 	if(args.size() == 3){
 
+		if((args[2][0] != '1')&&(args[2][0] != '2')&&(args[2][0] != 'T')){
+			out << "Invalid command";
+			return out.str();
+		}
+
+		int desk;
+		if(args[2][0] == 'T')
+			desk = -1;
+		else
+			desk = args[2][0] - '1';
+
+		m.lock();
+
 		switch(args[0][0]){
 			case 's':
-				return std::string("Not handled");
 			case 'b':
-				return std::string("Not handled");
+				out << "Not handled";
+				break;
 			case 'g':
 				switch(args[1][0]){
 					case 'l':
-						out << "l "<< args[2][0] << " <val>";
+						if(desk != -1){
+							out << "l "<< desk+1 << " " << desks[desk].illuminance;
+						}else{
+							out << "Invalid command";
+						}
 						break;
 					case 'd':
-						out << "d "<< args[2][0] << " <val>";
+						if(desk != -1){
+							out << "d " << desk+1 << " " << desks[desk].duty_cycle;
+						}else{
+							out << "Invalid command";
+						}
 						break;
 					case 's':
-						out << "s "<< args[2][0] << " <val>";
+						if(desk != -1){
+							out << "s "<< desk+1 << " " << desks[desk].occupancy;
+						}else{
+							out << "Invalid command";
+						}
 						break;
 					case 'L':
-						out << "L "<< args[2][0] << " <val>";
+						if(desk != -1){
+							out << "L "<< desk+1 << " " << desks[desk].illuminance_lb;
+						}else{
+							out << "Invalid command";
+						}
 						break;
 					case 'o':
-						out << "o "<< args[2][0] << " <val>";
+						if(desk != -1){
+							out << "o "<< desk+1 << " " << desks[desk].illuminance_bg;
+						}else{
+							out << "Invalid command";
+						}
 						break;
 					case 'r':
-						out << "r "<< args[2][0] << " <val>";
+						if(desk != -1){
+							out << "r "<< desk+1 << " " << desks[desk].illuminance_ref;
+						}else{
+							out << "Invalid command";
+						}
 						break;
 					case 'p':
-						out << "p "<< args[2][0] << " <val>";
+						if(desk != -1){
+							out << "p "<< desk+1 << " " << desks[desk].power;
+						}else{
+							out << "p T " << desks[0].power + desks[1].power;
+						}
 						break;
 					case 't':
-						out << "t "<< args[2][0] << " <val>";
+						if(desk != -1){
+							out << "t "<< desk+1 << " " << desks[desk].time_acc;
+						}else{
+							out << "Invalid command";
+						}
 						break;
 					case 'e':
-						out << "e "<< args[2][0] << " <val>";
+						if(desk != -1){
+							out << "e "<< desk+1 << " " << desks[desk].energy_acc;
+						}else{
+							out << "e T " << desks[0].energy_acc + desks[1].energy_acc;
+						}
 						break;
 					case 'c':
-						out << "c "<< args[2][0] << " <val>";
+						if(desk != -1){
+							out << "c "<< desk+1 << " " << desks[desk].comfort_error_acc;
+						}else{
+							out << "c T " << desks[0].comfort_error_acc + desks[1].comfort_error_acc;
+						}
 						break;
 					case 'v':
-						out << "v "<< args[2][0] << " <val>";
+						if(desk != -1){
+							out << "v "<< desk+1 << " " << desks[desk].comfort_flicker_acc;
+						}else{
+							out << "c T " << desks[0].comfort_flicker_acc + desks[1].comfort_flicker_acc;
+						}
 						break;
 					default:
 						out << "Unknown variable " << args[1][0];
@@ -145,6 +204,9 @@ std::string Session::fetch_data(const std::vector<std::string>& args) const{
 			default:
 				return std::string("Invalid command");
 		}
+
+		m.unlock();
+
 	}else{
 		if(args[0][0] == 'r')
 			return std::string("ack");
