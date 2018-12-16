@@ -14,6 +14,8 @@ public:
 	Server(boost::asio::io_service& ios, uint16_t port);
 	~Server();
 
+	void handle_accept(std::shared_ptr<Session> session, const boost::system::error_code& err);
+
 private:
 	boost::asio::io_service& ios;
 	boost::asio::ip::tcp::acceptor acceptor;

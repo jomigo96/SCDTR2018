@@ -38,3 +38,5 @@
 
 # Compiled executables
 main
+server
+client

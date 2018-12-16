@@ -1,7 +1,7 @@
 CC=g++
-CPPFLAGS=-c -std=c++11 -Wall -Wextra -pedantic
+CPPFLAGS=-g -c -std=c++11 -Wall -Wextra -pedantic
 LDFLAGS=-lpthread -lboost_system
-EXECUTABLE=main
+EXECUTABLE=server
 
 SOURCES=$(wildcard *.cpp)
 OBJECTS=$(notdir $(SOURCES:.cpp=.o))
@@ -18,4 +18,7 @@ clean:
 run: $(EXECUTABLE)
 	./$(EXECUTABLE)
 
-.PHONY: all clean
+client:
+	$(MAKE) -C client
+
+.PHONY: all clean client
