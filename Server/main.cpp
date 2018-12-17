@@ -78,18 +78,23 @@ void data_manager_thread(){
 		if(status && (xfer.rxCnt > 0)){
 			memcpy(&message, xfer.rxBuf, sizeof(message_t));
 			memset(xfer.rxBuf, 0 , BSC_FIFO_SIZE );
-            xfer.rxCnt=0;
+			std::cout << "Data with size " << xfer.rxCnt << " from "<< (int) message.address << std::endl;
+			xfer.rxCnt = 0;
+			continue;
 
 			if(message.code == sampling_time_data){
+				std::cout << "Data with size " << xfer.rxCnt << " from "<< (int) message.address << std::endl;
+				//std::cout << "message from " << (int)message.address << std::endl;
+				//std::cout << message.value[0] << std::endl;
 				int desk = (message.address == 1) ? 0 : 1;
 				m.lock();
 				desks[desk].samples++;
 				desks[desk].l_pprev = desks[desk].l_prev;
 				desks[desk].l_prev = desks[desk].illuminance;
 				desks[desk].illuminance = message.value[0];
-				desks[desk].illuminance_bg = message.value[1];
+				desks[desk].power = message.value[1];
 				desks[desk].illuminance_ref = message.value[2];
-				desks[desk].power = message.value[3];
+				desks[desk].illuminance_bg = message.value[3];
 				desks[desk].duty_cycle = message.aux1;
 				desks[desk].illuminance_lb = message.aux2;
 				desks[desk].occupancy = (desks[desk].illuminance_lb == lux_high) ? 1 : 0;
@@ -98,7 +103,7 @@ void data_manager_thread(){
 					desks[desk].comfort_error_acc += (desks[desk].illuminance_lb-desks[desk].illuminance);
 					desks[desk].comf_err_samples++;
 				}
-				if(samples >= 3){
+				if(desks[desk].samples >= 3){
 					if((desks[desk].l_prev-desks[desk].l_pprev)*(desks[desk].illuminance-desks[desk].l_prev)<0){
 						desks[desk].comfort_flicker_acc += (fabs(desks[desk].l_prev-desks[desk].l_pprev)+fabs(desks[desk].illuminance-desks[desk].l_prev))/(2*h);
 					}
@@ -112,6 +117,7 @@ void data_manager_thread(){
 				desks[1].time_acc = timestamp;
 				m.unlock();
 			}
+			xfer.rxCnt=0;
 		}
 	}
 }
