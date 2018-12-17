@@ -50,7 +50,6 @@ void data_manager_thread(){
 	bsc_xfer_t xfer;
 	message_t message;
 	const float lux_high = 250;
-	const float lux_low = 120;
 	const float h = 0.005;
 	uint32_t timestamp;
 
@@ -63,7 +62,7 @@ void data_manager_thread(){
 
 	std::cout << "Started with status " << status << std::endl;
 
-	timestap = std::chrono::duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+	timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	m.lock();
 	memset(desks, 0, 2*sizeof(desk_t));
 	desks[0].time_acc = timestamp;
@@ -91,7 +90,7 @@ void data_manager_thread(){
 				desks[desk].energy_acc += desks[desk].power * h;
 				m.unlock();
 			}else if(message.code == data){ //Calibration finished, counts as a restart
-				timestap = std::chrono::duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+				timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 				m.lock();
 				memset(desks, 0, 2*sizeof(desk_t));
 				desks[0].time_acc = timestamp;

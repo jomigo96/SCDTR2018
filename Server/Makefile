@@ -1,6 +1,6 @@
 CC=g++
 CPPFLAGS=-g -c -std=c++14 -Wall -Wextra -pedantic
-LDFLAGS=-lpthread -lboost_system
+LDFLAGS=-lpthread -lboost_system -lpigpio
 EXECUTABLE=server
 
 SOURCES=$(wildcard *.cpp)
@@ -16,7 +16,7 @@ clean:
 	rm -rf $(OBJECTS) $(EXECUTABLE)
 
 run: $(EXECUTABLE)
-	./$(EXECUTABLE)
+	sudo ./$(EXECUTABLE)
 
 client:
 	$(MAKE) -C client
