@@ -14,6 +14,7 @@
 #include <linux/i2c-dev.h>
 #include <stdlib.h>
 #include <cstdint>
+#include <cmath>
 #include <chrono>
 #define SLAVE_ADDR 0x00
 
@@ -53,6 +54,8 @@ void data_manager_thread(){
 	const float h = 0.005;
 	uint32_t timestamp;
 
+
+
 	if(gpioInitialise() < 0){
                 std::cerr << "Error initializing gpio" << std::endl;
                 return;
@@ -80,6 +83,9 @@ void data_manager_thread(){
 			if(message.code == sampling_time_data){
 				int desk = (message.address == 1) ? 0 : 1;
 				m.lock();
+				desks[desk].samples++;
+				desks[desk].l_pprev = desks[desk].l_prev;
+				desks[desk].l_prev = desks[desk].illuminance;
 				desks[desk].illuminance = message.value[0];
 				desks[desk].illuminance_bg = message.value[1];
 				desks[desk].illuminance_ref = message.value[2];
@@ -87,7 +93,16 @@ void data_manager_thread(){
 				desks[desk].duty_cycle = message.aux1;
 				desks[desk].illuminance_lb = message.aux2;
 				desks[desk].occupancy = (desks[desk].illuminance_lb == lux_high) ? 1 : 0;
-				desks[desk].energy_acc += desks[desk].power * h;
+				desks[desk].energy_acc += (desks[desk].power * h);
+				if(desks[desk].illuminance < desks[desk].illuminance_lb){
+					desks[desk].comfort_error_acc += (desks[desk].illuminance_lb-desks[desk].illuminance);
+					desks[desk].comf_err_samples++;
+				}
+				if(samples >= 3){
+					if((desks[desk].l_prev-desks[desk].l_pprev)*(desks[desk].illuminance-desks[desk].l_prev)<0){
+						desks[desk].comfort_flicker_acc += (fabs(desks[desk].l_prev-desks[desk].l_pprev)+fabs(desks[desk].illuminance-desks[desk].l_prev))/(2*h);
+					}
+				}
 				m.unlock();
 			}else if(message.code == data){ //Calibration finished, counts as a restart
 				timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();

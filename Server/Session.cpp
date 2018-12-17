@@ -170,7 +170,8 @@ std::string Session::fetch_data(const std::vector<std::string>& args) const{
 						break;
 					case 't':
 						if(desk != -1){
-							out << "t "<< desk+1 << " " << desks[desk].time_acc;
+							uint32_t time_now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+							out << "t "<< desk+1 << " " << (desks[desk].time_acc-time_now)/1000.0;
 						}else{
 							out << "Invalid command";
 						}
@@ -182,36 +183,71 @@ std::string Session::fetch_data(const std::vector<std::string>& args) const{
 							out << "e T " << desks[0].energy_acc + desks[1].energy_acc;
 						}
 						break;
-					case 'c':
+					case 'c':{
+						double error;
 						if(desk != -1){
-							out << "c "<< desk+1 << " " << desks[desk].comfort_error_acc;
+							if(desks[desk].comf_err_samples > 0){
+								error = desks[desk].comfort_error_acc/(double)desks[desk].comf_err_samples;
+							}else{
+								error = 0;
+							}
+							out << "c "<< desk+1 << " " << error;
 						}else{
-							out << "c T " << desks[0].comfort_error_acc + desks[1].comfort_error_acc;
+							if (desks[0].comf_err_samples > 0) {
+								error = desks[0].comfort_error_acc/(double)desks[0].comf_err_samples;
+							} else {
+								error = 0;
+							}
+							if (desks[1].comf_err_samples > 0) {
+								error += desks[1].comfort_error_acc/(double)desks[1].comf_err_samples;
+							}
+							out << "c T " << error;
 						}
-						break;
-					case 'v':
+						break;}
+					case 'v':{
+						double error;
 						if(desk != -1){
-							out << "v "<< desk+1 << " " << desks[desk].comfort_flicker_acc;
+							if(desks[desk].samples>0){
+								error = desks[desk].comfort_flicker_acc/(double)desks[desk].samples;
+							}else{
+								error = 0;
+							}
+							out << "v "<< desk+1 << " " << error;
 						}else{
-							out << "c T " << desks[0].comfort_flicker_acc + desks[1].comfort_flicker_acc;
+							if(desks[0].samples>0){
+								error = desks[0].comfort_flicker_acc/(double)desks[0].samples;
+							}else{
+								error = 0;
+							}
+							if(desks[1].samples>0){
+								error += desks[1].comfort_flicker_acc/(double)desks[1].samples;
+							}
+							out << "c T " << error;
 						}
-						break;
+						break;}
 					default:
 						out << "Unknown variable " << args[1][0];
 						break;
 				}
 				break;
 			default:
-				return std::string("Invalid command");
+				out << "Invalid command";
 		}
 
 		m.unlock();
 
 	}else{
-		if(args[0][0] == 'r')
-			return std::string("ack");
-		else
-			return std::string("Invalid command");
+		if(args[0][0] == 'r'){
+			uint32_t time_now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+			m.lock();
+			memset(desks, 0, 2*sizeof(desk_t));
+			desks[0].time_acc = time_now;
+			desks[1].time_acc = time_now;
+			m.unlock();
+			out << "ack";
+		}else{
+			out << "Invalid command";
+		}
 	}
 	return out.str();
 }

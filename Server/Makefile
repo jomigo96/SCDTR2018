@@ -1,6 +1,6 @@
 CC=g++
 CPPFLAGS=-g -c -std=c++14 -Wall -Wextra -pedantic
-LDFLAGS=-lpthread -lboost_system -lpigpio
+LDFLAGS=-lpthread -lboost_system -lpigpio -lm
 EXECUTABLE=server
 
 SOURCES=$(wildcard *.cpp)

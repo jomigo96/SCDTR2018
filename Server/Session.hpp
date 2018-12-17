@@ -7,6 +7,7 @@
 #include <mutex>
 #include <iostream>
 #include <string>
+#include <chrono>
 #include <vector>
 #include <condition_variable>
 #include "data_structures.hpp"
