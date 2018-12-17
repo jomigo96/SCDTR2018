@@ -59,7 +59,7 @@ void data_manager_thread(){
 	if(gpioInitialise() < 0){
                 std::cerr << "Error initializing gpio" << std::endl;
                 return;
-    }
+    	}
 
 	int status = init_slave(xfer, 0);
 
@@ -94,7 +94,7 @@ void data_manager_thread(){
 				desks[desk].illuminance = message.value[0];
 				desks[desk].power = message.value[1];
 				desks[desk].illuminance_ref = message.value[2];
-				desks[desk].illuminance_bg = message.value[3];
+				//desks[desk].illuminance_bg = message.value[3];
 				desks[desk].duty_cycle = message.aux1;
 				desks[desk].illuminance_lb = message.aux2;
 				desks[desk].occupancy = (desks[desk].illuminance_lb == lux_high) ? 1 : 0;

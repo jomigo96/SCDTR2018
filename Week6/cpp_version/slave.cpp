@@ -10,8 +10,11 @@
 #define SLAVE_ADDR 0x00
 
 typedef struct message{
-        bool flag;
+        uint8_t code;
         uint8_t address;
+	uint8_t aux1;
+	uint8_t aux2;
+	float value[4];
 } message_t;
 
 int init_slave(bsc_xfer_t &xfer, int addr){
@@ -38,6 +41,8 @@ int init_slave(bsc_xfer_t &xfer, int addr){
 
 int main(void){
 
+	std::cout << (int)BSC_FIFO_SIZE << std::endl;
+return 0; 
         message_t message;
 
         bsc_xfer_t xfer;
@@ -59,7 +64,14 @@ int main(void){
                         if(xfer.rxCnt > 0){
                                 std::cout << "Received "<< xfer.rxCnt << " bytes" << std::endl;
                                 memcpy(&message, xfer.rxBuf, sizeof(message_t));
-                                std::cout << message.flag << " - " << message.address << std::endl;
+                                std::cout << "address: " << (int)message.address << std::endl <<
+					     "code: " << (int)message.code << std::endl <<
+				             "aux1: " << (int)message.aux1 << std::endl <<
+                                             "aux2: " << (int)message.aux2 << std::endl <<
+                                             "value0: " << message.value[0] << std::endl <<
+                                             "value1: " << message.value[1] << std::endl <<
+                                             "value2: " << message.value[2] << std::endl <<
+                                             "value3: " << message.value[3] << std::endl;
                                 memset(xfer.rxBuf, 0 , BSC_FIFO_SIZE );
                                 xfer.rxCnt=0;
                         }
