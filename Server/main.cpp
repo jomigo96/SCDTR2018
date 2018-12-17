@@ -7,6 +7,15 @@
 #include <condition_variable>
 #include <cstring>
 #include "data_structures.hpp"
+#include <pigpio.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <signal.h>
+#include <linux/i2c-dev.h>
+#include <stdlib.h>
+#include <cstdint>
+#include <chrono>
+#define SLAVE_ADDR 0x00
 
 std::mutex m;
 std::condition_variable cv;
@@ -14,42 +23,85 @@ bool ready = false;
 const int desk_count = 2;
 desk_t desks[desk_count];
 
+int init_slave(bsc_xfer_t &xfer, int addr){
+
+        gpioSetMode(18, PI_ALT3);
+        gpioSetMode(19, PI_ALT3);
+        xfer.control = (addr<<16) |
+                        (0x00<<13) |
+                        (0x00<<12) |
+                        (0x00<<11) |
+                        (0x00<<10) |
+                        (0x01<<9) |
+                        (0x01<<8) |
+                        (0x00<<7) |
+                        (0x00<<6) |
+                        (0x00<<5) |
+                        (0x00<<4) |
+                        (0x00<<3) |
+                        (0x01<<2) |
+                        (0x00<<1) |
+                        0x01;
+        return bscXfer(&xfer);
+}
+
 void data_manager_thread(){
 
+	bsc_xfer_t xfer;
+	message_t message;
+	const float lux_high = 250;
+	const float lux_low = 120;
+	const float h = 0.005;
+	uint32_t timestamp;
 
+	if(gpioInitialise() < 0){
+                std::cerr << "Error initializing gpio" << std::endl;
+                return;
+    }
 
+	int status = init_slave(xfer, 0);
+
+	std::cout << "Started with status " << status << std::endl;
+
+	timestap = std::chrono::duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 	m.lock();
-		desks[0].illuminance=80;
-		desks[0].duty_cycle=95;
-		desks[0].occupancy=1;
-		desks[0].illuminance_lb=80;
-		desks[0].illuminance_bg=5;
-		desks[0].illuminance_ref=80;
-		desks[0].power=0.5;
-		desks[0].time_acc=1231;
-		desks[0].energy_acc=12.154;
-		desks[0].comfort_error_acc=1.54546;
-		desks[0].comfort_flicker_acc=5.12121;
-		desks[1].illuminance=85;
-		desks[1].duty_cycle=50;
-		desks[1].occupancy=0;
-		desks[1].illuminance_lb=50;
-		desks[1].illuminance_bg=10;
-		desks[1].illuminance_ref=80;
-		desks[1].power=0.4;
-		desks[1].time_acc=12321;
-		desks[1].energy_acc=12;
-		desks[1].comfort_error_acc=1.54;
-		desks[1].comfort_flicker_acc=1.02;
+	memset(desks, 0, 2*sizeof(desk_t));
+	desks[0].time_acc = timestamp;
+	desks[1].time_acc = timestamp;
 	m.unlock();
 
 	while(1){
-		std::unique_lock<std::mutex> lck(m);
-		while(!ready)
-			cv.wait(lck);
+		xfer.txCnt = 0;
+		status=bscXfer(&xfer);
+		if(status && (xfer.rxCnt > 0)){
+			memcpy(&message, xfer.rxBuf, sizeof(message_t));
+			memset(xfer.rxBuf, 0 , BSC_FIFO_SIZE );
+            xfer.rxCnt=0;
 
+			if(message.code == sampling_time_data){
+				int desk = (message.address == 1) ? 0 : 1;
+				m.lock();
+				desks[desk].illuminance = message.value[0];
+				desks[desk].illuminance_bg = message.value[1];
+				desks[desk].illuminance_ref = message.value[2];
+				desks[desk].power = message.value[3];
+				desks[desk].duty_cycle = message.aux1;
+				desks[desk].illuminance_lb = message.aux2;
+				desks[desk].occupancy = (desks[desk].illuminance_lb == lux_high) ? 1 : 0;
+				desks[desk].energy_acc += desks[desk].power * h;
+				m.unlock();
+			}else if(message.code == data){ //Calibration finished, counts as a restart
+				timestap = std::chrono::duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+				m.lock();
+				memset(desks, 0, 2*sizeof(desk_t));
+				desks[0].time_acc = timestamp;
+				desks[1].time_acc = timestamp;
+				m.unlock();
+			}
+		}
 	}
 }
+
 
 int main(){
 
