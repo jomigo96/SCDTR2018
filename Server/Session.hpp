@@ -26,32 +26,32 @@ extern std::pair< std::deque<std::pair<float, float>> , std::deque<std::pair<flo
 class Session : public std::enable_shared_from_this<Session>{
 
 public:
-	Session(boost::asio::io_service& ios);
-	~Session();
+    Session(boost::asio::io_service& ios);
+    ~Session();
 
-	tcp::socket& get_socket();
+    tcp::socket& get_socket();
 
-	void start();
+    void start();
 
 
 
 private:
-	boost::asio::io_service& ios;
-	tcp::socket sock;
-	boost::asio::io_service::strand write_strand;
-	boost::asio::streambuf in_buf;
-	std::string out_data;
+    boost::asio::io_service& ios;
+    tcp::socket sock;
+    boost::asio::io_service::strand write_strand;
+    boost::asio::streambuf in_buf;
+    std::string out_data;
 
-	char stream_var;
-	int stream_node;
-	bool stream_stop;
+    char stream_var;
+    int stream_node;
+    bool stream_stop;
 
-	void handle_read(std::shared_ptr<Session>& s, const boost::system::error_code& err, size_t byte_n);
-	void handle_write(std::shared_ptr<Session>& s, const boost::system::error_code& err, size_t n);
-	std::string fetch_data(const std::vector<std::string>& args) const;
-	void send_reply(void);
-	void start_streaming(std::shared_ptr<Session>& s, const boost::system::error_code& err, size_t n);
-	void send_sample();
+    void handle_read(std::shared_ptr<Session>& s, const boost::system::error_code& err, size_t byte_n);
+    void handle_write(std::shared_ptr<Session>& s, const boost::system::error_code& err, size_t n);
+    std::string fetch_data(const std::vector<std::string>& args) const;
+    void send_reply(void);
+    void start_streaming(std::shared_ptr<Session>& s, const boost::system::error_code& err, size_t n);
+    void send_sample();
 };
 
 
