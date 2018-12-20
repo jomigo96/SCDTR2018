@@ -18,7 +18,7 @@
 #include <chrono>
 #define SLAVE_ADDR 0x00
 
-#define DEBUG
+//#define DEBUG
 
 std::mutex m;
 std::condition_variable cv;
@@ -80,7 +80,7 @@ void data_manager_thread(){
 		if(status && (xfer.rxCnt > 0)){
 			memcpy(&message, xfer.rxBuf, sizeof(message_t));
 			memset(xfer.rxBuf, 0 , BSC_FIFO_SIZE );
-#idfed DEBUG
+#ifdef DEBUG
             std::cout << "Data with size " << xfer.rxCnt << " from "<< (int) message.address << std::endl;
 #endif
             xfer.rxCnt = 0;
@@ -115,9 +115,9 @@ void data_manager_thread(){
 			}else if(message.code == data){ //Calibration finished, counts as a restart
 				timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 				m.lock();
-				memset(desks[desk], 0, sizeof(desk_t));
+				memset(&desks[desk], 0, sizeof(desk_t));
 				desks[desk].time_acc = timestamp;
-                desks[desk].illuminance_bg = mesage.value[0];
+                desks[desk].illuminance_bg = message.value[0];
 				m.unlock();
 			}
 			xfer.rxCnt=0;
