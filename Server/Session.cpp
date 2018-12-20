@@ -258,6 +258,8 @@ std::string Session::fetch_data(const std::vector<std::string>& args) const{
 			memset(desks, 0, 2*sizeof(desk_t));
 			desks[0].time_acc = time_now;
 			desks[1].time_acc = time_now;
+			last_minute_buffer.first.clear();
+			last_minute_buffer.second.clear();
 			m.unlock();
 			out << "ack";
 		}else{

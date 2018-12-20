@@ -114,12 +114,12 @@ void data_manager_thread(){
 				}
 
                 if(desk == 0){
-                    last_minute_buffer.first.push_back(std::pair<desks[0].illuminance, desks[0].duty_cycle>);
-                    if(last_minute_buffer.first.size()>20)
+                    last_minute_buffer.first.emplace_back(desks[0].illuminance, desks[0].duty_cycle);
+                    if(last_minute_buffer.first.size()>1200)
                         last_minute_buffer.first.pop_front();
                 }else{
-                    last_minute_buffer.second.push_back(std::pair<desks[1].illuminance, desks[1].duty_cycle>);
-                    if(last_minute_buffer.second.size()>20)
+                    last_minute_buffer.second.emplace_back(desks[1].illuminance, desks[1].duty_cycle);
+                    if(last_minute_buffer.second.size()>1200)
                         last_minute_buffer.second.pop_front();
                 }
 
