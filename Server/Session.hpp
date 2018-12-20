@@ -9,6 +9,7 @@
 #include <string>
 #include <chrono>
 #include <vector>
+#include <deque>
 #include <condition_variable>
 #include "data_structures.hpp"
 
@@ -20,6 +21,7 @@ extern std::mutex m;
 extern std::condition_variable cv;
 extern bool ready;
 extern desk_t desks[];
+extern std::pair< std::deque<std::pair<float, float>> , std::deque<std::pair<float, float> > > last_minute_buffer;
 
 class Session : public std::enable_shared_from_this<Session>{
 

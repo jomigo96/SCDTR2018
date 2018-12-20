@@ -114,8 +114,23 @@ std::string Session::fetch_data(const std::vector<std::string>& args) const{
 
 		switch(args[0][0]){
 			case 's':
-			case 'b':
 				out << "Not handled";
+				break;
+			case 'b':
+				{
+					char c = args[1][0];
+					if((desk != -1)&&((c == 'l')||(c == 'd'))){
+						auto &desk_values = (desk == 0) ? last_minute_buffer.first : last_minute_buffer.second;
+
+						out << "b " << args[1][0] << " " << desk+1;
+
+						for(auto it = desk_values.cbegin(); it!=desk_values.cend(); it++){
+							out << ", " << ((c == 'l') ? (*it).first : (*it).second);
+						}
+					}else{
+						out << "Invalid";
+					}
+				}
 				break;
 			case 'g':
 				switch(args[1][0]){

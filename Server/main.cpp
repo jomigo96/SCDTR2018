@@ -16,6 +16,7 @@
 #include <cstdint>
 #include <cmath>
 #include <chrono>
+#include <deque>
 #define SLAVE_ADDR 0x00
 
 //#define DEBUG
@@ -25,6 +26,8 @@ std::condition_variable cv;
 bool ready = false;
 const int desk_count = 2;
 desk_t desks[desk_count];
+std::pair< std::deque<std::pair<float, float>> , std::deque<std::pair<float, float> > > last_minute_buffer;
+
 
 int init_slave(bsc_xfer_t &xfer, int addr){
 
@@ -55,8 +58,6 @@ void data_manager_thread(){
 	const float lux_high = 250;
 	const float h = 0.005;
 	uint32_t timestamp;
-
-
 
 	if(gpioInitialise() < 0){
                 std::cerr << "Error initializing gpio" << std::endl;
@@ -111,6 +112,17 @@ void data_manager_thread(){
 						desks[desk].comfort_flicker_acc += (fabs(desks[desk].l_prev-desks[desk].l_pprev)+fabs(desks[desk].illuminance-desks[desk].l_prev))/(2*h);
 					}
 				}
+
+                if(desk == 0){
+                    last_minute_buffer.first.push_back(std::pair<desks[0].illuminance, desks[0].duty_cycle>);
+                    if(last_minute_buffer.first.size()>20)
+                        last_minute_buffer.first.pop_front();
+                }else{
+                    last_minute_buffer.second.push_back(std::pair<desks[1].illuminance, desks[1].duty_cycle>);
+                    if(last_minute_buffer.second.size()>20)
+                        last_minute_buffer.second.pop_front();
+                }
+
 				m.unlock();
 			}else if(message.code == data){ //Calibration finished, counts as a restart
 				timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
