@@ -1,6 +1,6 @@
 % arara: xelatex: { shell: yes, synctex: yes }
 \RequirePackage[l2tabu, orthodox]{nag}
-\documentclass[english,palatino]{ist-report}
+\documentclass[english,fira]{ist-report}
 
 \input{preamble}
 
@@ -17,10 +17,12 @@
 
 \setminted[c]{linenos, frame = leftline, breaklines}
 
-\newrobustcmd*{\matr}[1]{\mathbf{#1}}
+\newrobustcmd*{\matr}[1]{\symbf{#1}}
 \newrobustcmd*{\ccode}[1]{\mintinline{c}{#1}}
 
 \newrobustcmd*{\ccheckmark}{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;} 
+
+\renewcommand{\baselinestretch}{1.15}
 
 \addbibresource{bibliography.bib}
 
@@ -54,11 +56,90 @@
 \end{titlepage}
 \setcounter{page}{1}
 
+\begin{abstract}
+	In this technical report we will present the design and development of a LED-powered office illumination system that implements distributed real-time control to maintain comfortable levels of luminance for its users. We will discuss the approaches done to the modelling of each sensor and corresponding LED and its individual control system, the method of communication between all connected sensor-LED pairs (henceforth referred to as desks), the interaction between the lights emitted by each desk and their joined effort to reduce lighting costs and maximize user comfort, and the gathering of relevant data for diagnostics.
+\end{abstract}
+
 {\hypersetup{linkcolor = black} \tableofcontents}
 
-\section{Introdução}
+\section{Introduction}
+
+\pagebreak
+\appendix
 
 \todo[inline]{Mencionar que toda a implementação é feita para 2 nodes, apesar de ser tudo extensível, blah blah}
+
+\section{Report Structure}
+
+This should be the report structure according to the class slides (Distributed Real-Time Control Systems, module 32).
+\begin{description}
+	\item[Abstract] A summary in less than 200 words;
+	\item[Introduction] Motivation, challenges, main idea, objectives, outline;
+	\item[Background/Concepts] Common knowledge required;
+	\item[Related Work] State-of-the-art;
+	\item[Development] Your approach, methodologies, innovations;
+	\item[Experiments] Carefully explain the design of the experiments;
+	\item[Results] Illustrate and comment on the results of experiments;
+	\item[Discussion] Maybe in results;
+	\item[Conclusions and Future] Critically comment on what was achieved and indicate points of improvement;
+	\item[Bibliography]
+	\item[Appendices]
+\end{description}
+
+Report should be less than 20 pages total, including everything.
+
+\subsection{Discussable Topics}
+
+\begin{itemize}
+	\item Theoretical introduction and discussion of topic (office space illumination)
+	\item Objective
+	\item Composition of desks
+	\item Illuminance measurement system
+	\item LED actuation system
+	\item Desk illumination model
+	\item Desk illumination controller
+	\item Gathering data
+	\item Inter-desk communication
+	\item Bus monitoring
+	\item Calibration
+	\item Distributed control algorithm
+	\item Data server
+	\begin{itemize}
+		\item Performance metrics
+		\item C++ implementation
+	\end{itemize}
+\end{itemize}
+
+Implementation notes from stage 1.
+\begin{itemize}
+	\item Make plots for the different signals in the control system (references, control values, measurements) and compute metrics that show the correct operation of the system.
+	\item Choose messages with short size and a high baud rate. Compute communication delays and verify that the communication time can be acommodated within the available control loop period.
+	\item Graphically visualize the data in MATLAB or Excel.
+\end{itemize}
+
+Documentation notes from stage 1.
+\begin{itemize}
+	\item Take pictures of the interior and of the exterior of the box enclosing the luminaires. Make sure that you illustrate the position of the LED, the LDR and the emission/reflection path.
+	\item Show plots of the steady state characteristic of the system. Show step responses of the system in different illuminance conditions.
+	\item Characterize the jitter in your control system. How much does the sampling rate deviate from the desired one?
+	\item Characterize the error in your feedforward controller. In particular, implement a predictor of your system and compute the average mean squared error between the prediction and the measurements.
+	\item Characterize the dynamic characteristics of the feedback controller, in different illuminance conditions (overshoot, damping factor).
+	\item Illustrate any improvements that you make to the basic feedback controller (feedforward term, anti-windup, etc) with plots of the time responses.
+	\item Comment the Arduino code for your controller.
+	\item Characterize the processing time taken by the control computation, serial communications and other computations.
+\end{itemize}
+
+Documentation notes from stage 2. \\
+\textit{``In your report, please do not forget to address the following issues''}
+\begin{description}
+	\item[I2C communications] Indicate the average time required to send a request message and receive an answer.
+	\item[C++ classes, sockets, parallelism] Indicate the C++ classes that are most relevant for coding the server running on the PC interfacing to the Arduinos.
+	\item[Sockets] List the number of sockets used to implement the server. Describe the functions of the sockets.
+	\item[Concurrency] Indicate the methodologies used in the server to implement parallelism in order to process requests from multiple clients.
+	\item[Distributed control] Describe the implementation of the cooperative distributed controller.
+	\item[Experiments] Perform experiments to compare results between the cooperative distributed contrller and the non-cooperative controller (independent local controllers). Plot the time response of both controllers in similar situations and create a table with their performance metrics.
+\end{description}
+
 
 \section{Raspbian Startup}
 \begin{enumerate}
@@ -75,14 +156,13 @@
 
 \paragraph{Importante} Antes de desligar o Raspberry Pi, correr \texttt{sudo shutdown -h now} para evitar corrupção do sistema operativo.
 
-
 \section{Illumination system calibration}
 
 \subsection{Principles of the calibration procedure}
 
 The illuminance at each desk follows the model
 \begin{gather}
-  L = K \mathbf{d} + \mathbf{o} \nonumber \\ 
+  L = K \matr{d} + \matr{o} \nonumber \\ 
   \left[\begin{array}{c} l_{1}\\ l_{2} \end{array}\right] =
   \left[\begin{array}{cc}
 	k_{11} & k_{12}\\
@@ -107,7 +187,7 @@ It also should be noted that internally, the nodes are not distinguishable as 1 
 \section{Optimização do Sistema Distribuído}
 
 \begin{gather*}
-	u^* = \textrm{argmin}\,J(x, \mu) \\
+	u^* = \text{argmin}\,J(x, \mu) \\
 	l_i = \sum^n_{j=1} d_j k_{ij} + o_i \geq L_i, \qquad 0 \leq d_i \leq 100, \quad \forall i \\
 	\matr{l} = \matr{K}\matr{d} + \matr{o} \geq \matr{L}, \qquad 0 \leq d \leq 100
 \end{gather*}
@@ -207,8 +287,7 @@ From what I see, this is everything we need to send the server, and it should be
 
 I might have missed something, we'll see.
 
-\appendix
-\section{Esquemas}
+\section{Schematics and Charts}
 
 \begin{figure}[ht]
 	\centering

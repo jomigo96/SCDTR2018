@@ -21,7 +21,7 @@
 
 % ---------------- Identification ----------------
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{ist-report}[2018/11/28 v0.7.1 Unofficial IST report class]
+\ProvidesClass{ist-report}[2018/12/20 v0.7.2 Unofficial IST report class]
 
 % ----------------- Initial Code -----------------
 \typeout{_____________________________________________________________________________}
@@ -64,6 +64,7 @@
 \newbool{@blackandwhite}
 \newbool{@purist}
 \newbool{@minimal}
+\newbool{@fira}
 
 % ------------ Declaration of Options ------------
 \DeclareOption{palatino}	{\booltrue{@palatino}}
@@ -72,6 +73,7 @@
 \DeclareOption{bw}			{\booltrue{@blackandwhite}}
 \DeclareOption{purist}		{\booltrue{@purist}}
 \DeclareOption{minimal}		{\booltrue{@minimal}}
+\DeclareOption{fira}		{\booltrue{@fira}}
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{article}}
 
 % ------------- Execution of Options -------------
@@ -82,40 +84,93 @@
 \LoadClass{article}
 
 % Define option hierarchy and set conflict resolution
-\ifbool{@purist}{
-	\boolfalse{@minimal}
-	\boolfalse{@twocolumn}
-	\boolfalse{@palatino}
-}{}
-\ifbool{@minimal}{
-	\boolfalse{@twoside}
-	\boolfalse{@twocolumn}
-}{}
-\ifbool{@english}{
-	\boolfalse{@portuguese}
-}{}
+\ifbool{@purist}
+	{ \boolfalse{@minimal} \boolfalse{@twocolumn} \boolfalse{@palatino} }
+	{}
+\ifbool{@minimal}
+	{ \boolfalse{@twoside} \boolfalse{@twocolumn} }
+	{}
+\ifbool{@english}
+	{ \boolfalse{@portuguese} }
+	{}
 
 % Unicode boolean for either XeTeX or LuaTeX
 \newbool{unicode}
 \ifbool{xetex}{
 	\booltrue{unicode}
 }{
-	\ifbool{luatex}{
-		\booltrue{unicode}
-	}{
-		\boolfalse{unicode}
-	}
+	\ifbool{luatex}
+		{ \booltrue{unicode} }
+		{ \boolfalse{unicode} }
 }
 
 \RequirePackage{mathtools}
 
 \RequirePackage{geometry}
+
+% Fix for header and footer margins not updating with renewed margins %
+\let\Oldgeometry\geometry
+\renewcommand{\geometry}[1]{
+	\Oldgeometry{#1}
+	\setlength{\headwidth}{\textwidth}
+}
+
 \RequirePackage{graphicx}
 \RequirePackage{hyperref}
 
 \ifbool{unicode}{
-	\RequirePackage{fontspec}
+	\RequirePackage[no-math]{fontspec}
 	\defaultfontfeatures{Ligatures = TeX}
+}{
+	\RequirePackage[utf8]{inputenc}
+	\RequirePackage[T1]{fontenc}
+}
+
+% === Main font selection ===
+\ifbool{@purist}{
+	\ifbool{unicode}{
+		\setsansfont[
+			Extension = .otf,
+			UprightFont = *-regular,
+			BoldFont = *-bold,
+			ItalicFont = *-italic,
+			BoldItalicFont = *-bolditalic]{texgyreheros}
+		\renewcommand{\familydefault}{\sfdefault}
+		\setmonofont[Scale = 1.14]{inconsolata}
+		\RequirePackage{newtxsf}
+	}{
+		\RequirePackage{newtxsf}
+		\RequirePackage{tgheros}
+		\renewcommand{\familydefault}{\sfdefault}
+		\RequirePackage[scaled = 1.14]{inconsolata}
+	}
+}{
+	\ifbool{@fira}{
+		\booltrue{@purist}
+		\RequirePackage[sfdefault]{FiraSans}
+		\renewcommand*\oldstylenums[1]{{\firaoldstyle #1}}
+		\ifbool{unicode}{
+			\RequirePackage[mathrm = sym]{unicode-math}
+			\setmathfont[
+				Path = ./fonts/,
+				Extension = .otf]{FiraMath-Regular}
+		}{
+			\RequirePackage{newtxsf}
+		}
+		\RequirePackage{FiraMono}
+	}{
+		\ifbool{@palatino}{
+			\RequirePackage[osf]{newpxtext}
+			\RequirePackage{eulervm}
+			\RequirePackage[scaled = 1.05]{nimbusmononarrow}
+		}{
+			\RequirePackage{lmodern}
+		}
+	}
+}
+% === End font selection ===
+
+\ifbool{unicode}{
 	\RequirePackage{polyglossia}
 	\ifbool{@english}{
 		\setmainlanguage[variant = british]{english}
@@ -125,37 +180,9 @@
 		\setotherlanguage[variant = british]{english}
 	}
 }{
-	\RequirePackage[utf8]{inputenc}
-	\RequirePackage[T1]{fontenc}
-	\ifbool{@english}{
-		\RequirePackage[english]{babel}
-	}{
-		\RequirePackage[portuguese]{babel}
-	}
-}
-
-\ifbool{@purist}{
-	\ifbool{unicode}{
-		\setmainfont[
-			UprightFont = *-regular,
-			Extension = .otf,
-			BoldFont = *-bold,
-			ItalicFont = *-italic,
-			BoldItalicFont = *-bolditalic]{texgyreheros}
-		\setmonofont[Scale = 1.14]{inconsolata}
-	}{
-		\RequirePackage{tgheros}
-		\renewcommand{\familydefault}{\sfdefault}
-		\RequirePackage[scaled = 1.14]{inconsolata}
-	}
-}{
-	\ifbool{@palatino}{
-		\RequirePackage[osf]{newpxtext}
-		\RequirePackage{eulervm}
-		\RequirePackage[scaled = 1.05]{nimbusmononarrow}
-	}{
-		\RequirePackage{lmodern}
-	}
+	\ifbool{@english}
+		{ \RequirePackage[english]{babel} }
+		{ \RequirePackage[portuguese]{babel} }
 }
 
 \RequirePackage{microtype}
@@ -177,10 +204,7 @@
 %  == Setup ==
 
 \ifbool{@purist}{
-	\geometry{a4paper,
-		vmargin = 2.5cm,
-		hmargin = 2.5cm,
-	}
+	\geometry{a4paper, margin = 2.5cm}
 	\renewcommand\baselinestretch{1.5}
 }{
 	\ifbool{@minimal}{
@@ -196,12 +220,13 @@
 	}{
 		\geometry{a4paper,
 			includeheadfoot,
-			vmargin = 2cm,
+			top = 1cm,
+			bottom = 2cm,
 			hmargin = 3.5cm,
 		}
-		\ifbool{@twoside}{
-			\geometry{twoside}
-		}{}
+		\ifbool{@twoside}
+			{ \geometry{twoside} }
+			{}
 	}
 }
 
