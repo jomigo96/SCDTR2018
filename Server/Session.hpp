@@ -42,10 +42,16 @@ private:
 	boost::asio::streambuf in_buf;
 	std::string out_data;
 
+	char stream_var;
+	int stream_node;
+	bool stream_stop;
+
 	void handle_read(std::shared_ptr<Session>& s, const boost::system::error_code& err, size_t byte_n);
 	void handle_write(std::shared_ptr<Session>& s, const boost::system::error_code& err, size_t n);
 	std::string fetch_data(const std::vector<std::string>& args) const;
 	void send_reply(void);
+	void start_streaming(std::shared_ptr<Session>& s, const boost::system::error_code& err, size_t n);
+	void send_sample();
 };
 
 

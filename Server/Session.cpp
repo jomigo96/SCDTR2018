@@ -44,7 +44,35 @@ void Session::handle_read(std::shared_ptr<Session>& s, const boost::system::erro
 		if((args.size() != 1) && (args.size() != 3)){
 			out_data = std::string("Invalid command number");
 		}else{
-			out_data = this->fetch_data(args);
+			if((args[0].size() == 1) && (args[0][0] == 's')){
+				stream_var = args[1][0];
+				stream_node = (int)args[2][0] - '1';
+				stream_stop = false;
+
+				//Prepare to be stopped
+				boost::asio::async_read_until(sock,
+			        						in_buf,
+											'\n',
+			        						[me=shared_from_this()]
+											(const boost::system::error_code& err, size_t n){
+												me->stream_stop=true;
+												std::cout << "Stopped streamming" << std::endl;
+
+												// Clear buffer
+												std::istream message(&(me->in_buf));
+												std::string s;
+												while(message >> s)
+													;
+
+												(void)err; //Suppress unused parameter warnings
+												(void)n;
+											});
+
+				this->start_streaming(s, err, (size_t)0);
+				return;
+			}else{
+				out_data = this->fetch_data(args);
+			}
 		}
 		std::cout << "Sending back: " << out_data << std::endl;
 		out_data += '\n';
@@ -71,7 +99,6 @@ void Session::send_reply(){
 													  	  boost::asio::placeholders::error,
 														  boost::asio::placeholders::bytes_transferred
 													  )));
-
 }
 
 void Session::start(){
@@ -85,6 +112,69 @@ void Session::start(){
 											  boost::asio::placeholders::bytes_transferred));
 }
 
+void Session::start_streaming(std::shared_ptr<Session>& s, const boost::system::error_code& err, size_t n){
+
+	if(err){
+		s.reset();
+		return;
+	}
+
+	if(stream_stop){
+		out_data = std::string("ack");
+		ios.post(write_strand.wrap([me=shared_from_this()]
+								(){
+									me->send_reply();
+								}));
+		return;
+	}
+
+	(void)n; //Supress unused parameter warning
+
+	std::stringstream out;
+
+	if(((stream_var != 'd')&&(stream_var != 'l'))||((stream_node != 0)&&(stream_node != 1))){
+		out_data = std::string("Invalid option");
+		ios.post(write_strand.wrap([me=shared_from_this()]
+								(){
+									me->send_reply();
+								}));
+		return;
+	}
+
+	{//scope for the lock
+		std::unique_lock<std::mutex> lck(m);
+		while(!ready){
+			cv.wait(lck);
+		}
+		ready=false;
+
+
+		long time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
+		out << "s " << stream_var << " " << stream_node+1 << " "
+		    << ((stream_var == 'l') ? desks[stream_node].illuminance : desks[stream_node].duty_cycle) << " " << time << "\n";
+	}
+
+	out_data = out.str();
+	ios.post(write_strand.wrap([me=shared_from_this()]
+							(){
+								me->send_sample();
+							}));
+
+
+}
+
+void Session::send_sample(void){
+
+	boost::asio::async_write(sock,
+							boost::asio::buffer(out_data),
+							write_strand.wrap(boost::bind(&Session::start_streaming,
+														  this,
+														  shared_from_this(),
+														  boost::asio::placeholders::error,
+														  boost::asio::placeholders::bytes_transferred
+													  )));
+}
 
 std::string Session::fetch_data(const std::vector<std::string>& args) const{
 	// I know this swich is ugly af

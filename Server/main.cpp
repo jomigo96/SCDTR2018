@@ -7,7 +7,7 @@
 #include <condition_variable>
 #include <cstring>
 #include "data_structures.hpp"
-#include <pigpio.h>
+//#include <pigpio.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <signal.h>
@@ -23,7 +23,7 @@
 
 std::mutex m;
 std::condition_variable cv;
-bool ready = false;
+bool ready;
 const int desk_count = 2;
 desk_t desks[desk_count];
 std::pair< std::deque<std::pair<float, float>> , std::deque<std::pair<float, float> > > last_minute_buffer;
@@ -59,10 +59,12 @@ void data_manager_thread(){
 	const float h = 0.005;
 	uint32_t timestamp;
 
+    ready = false;
+
 	if(gpioInitialise() < 0){
                 std::cerr << "Error initializing gpio" << std::endl;
                 return;
-    	}
+    }
 
 	int status = init_slave(xfer, 0);
 
@@ -87,7 +89,7 @@ void data_manager_thread(){
             xfer.rxCnt = 0;
 
             if((message.address != 1) && (message.address != 9))
-                continue; // Data is corruputed
+                continue; // Data is corruputed, ignore
             int desk = (message.address == 1) ? 0 : 1;
 
 			if(message.code == sampling_time_data){
@@ -123,6 +125,7 @@ void data_manager_thread(){
                         last_minute_buffer.second.pop_front();
                 }
 
+                cv.notify_all();
 				m.unlock();
 			}else if(message.code == data){ //Calibration finished, counts as a restart
 				timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
@@ -136,6 +139,22 @@ void data_manager_thread(){
 		}
 	}
 }
+
+
+/*void dummy_data_generator(){
+
+    memset(desks, 0, 2*sizeof(desk_t));
+    while(1){
+        std::this_thread::sleep_for (std::chrono::seconds(5));
+        {
+            std::lock_guard<std::mutex> lck(m);
+            desks[0].illuminance+=1;
+            ready=true;
+            cv.notify_all();
+        }
+    }
+
+}*/
 
 
 int main(){
