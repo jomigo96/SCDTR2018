@@ -111,7 +111,7 @@ public:
 
 		//Clean-up
 #ifndef SUPRESS_LUX
-		Serial.println(saturation(value)/255.0-d);
+		Serial.println(*L);
 #endif
 		t += h;
 	    

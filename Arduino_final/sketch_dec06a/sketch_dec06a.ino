@@ -44,7 +44,7 @@ const float c1=1;
 #else
 Controller controller = Controller(7.3250, -1.4760, 10000, 1e-6);
 float K22=326.84, K11=411.81, K21=92.72, K12=109.37, o2=4.88, o1=6.82; //Typical values
-const float c1=4;
+const float c1=1;
 #endif
 
 // Control
@@ -215,7 +215,7 @@ void loop() {
 
 		controller.PID_control(target, d_sol/100.0, &dimming, &L);
 
-		send_sample_time_data(own_address, dimming, lower_bound, L, o1, target, c1);
+		send_sample_time_data(own_address, dimming, lower_bound, L, target, c1);
 		debouncer++;
 	}
 }

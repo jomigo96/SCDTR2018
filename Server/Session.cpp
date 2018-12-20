@@ -171,7 +171,7 @@ std::string Session::fetch_data(const std::vector<std::string>& args) const{
 					case 't':
 						if(desk != -1){
 							uint32_t time_now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-							out << "t "<< desk+1 << " " << (desks[desk].time_acc-time_now)/1000.0;
+							out << "t "<< desk+1 << " " << (float)(time_now-desks[desk].time_acc)/1000.0;
 						}else{
 							out << "Invalid command";
 						}

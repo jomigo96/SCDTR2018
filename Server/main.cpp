@@ -18,6 +18,8 @@
 #include <chrono>
 #define SLAVE_ADDR 0x00
 
+#define DEBUG
+
 std::mutex m;
 std::condition_variable cv;
 bool ready = false;
@@ -78,15 +80,17 @@ void data_manager_thread(){
 		if(status && (xfer.rxCnt > 0)){
 			memcpy(&message, xfer.rxBuf, sizeof(message_t));
 			memset(xfer.rxBuf, 0 , BSC_FIFO_SIZE );
-			std::cout << "Data with size " << xfer.rxCnt << " from "<< (int) message.address << std::endl;
-			xfer.rxCnt = 0;
-			continue;
+#idfed DEBUG
+            std::cout << "Data with size " << xfer.rxCnt << " from "<< (int) message.address << std::endl;
+#endif
+            xfer.rxCnt = 0;
+
+            if((message.address != 1) && (message.address != 9))
+                continue; // Data is corruputed
+            int desk = (message.address == 1) ? 0 : 1;
 
 			if(message.code == sampling_time_data){
-				std::cout << "Data with size " << xfer.rxCnt << " from "<< (int) message.address << std::endl;
-				//std::cout << "message from " << (int)message.address << std::endl;
-				//std::cout << message.value[0] << std::endl;
-				int desk = (message.address == 1) ? 0 : 1;
+
 				m.lock();
 				desks[desk].samples++;
 				desks[desk].l_pprev = desks[desk].l_prev;
@@ -94,7 +98,6 @@ void data_manager_thread(){
 				desks[desk].illuminance = message.value[0];
 				desks[desk].power = message.value[1];
 				desks[desk].illuminance_ref = message.value[2];
-				//desks[desk].illuminance_bg = message.value[3];
 				desks[desk].duty_cycle = message.aux1;
 				desks[desk].illuminance_lb = message.aux2;
 				desks[desk].occupancy = (desks[desk].illuminance_lb == lux_high) ? 1 : 0;
@@ -112,9 +115,9 @@ void data_manager_thread(){
 			}else if(message.code == data){ //Calibration finished, counts as a restart
 				timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 				m.lock();
-				memset(desks, 0, 2*sizeof(desk_t));
-				desks[0].time_acc = timestamp;
-				desks[1].time_acc = timestamp;
+				memset(desks[desk], 0, sizeof(desk_t));
+				desks[desk].time_acc = timestamp;
+                desks[desk].illuminance_bg = mesage.value[0];
 				m.unlock();
 			}
 			xfer.rxCnt=0;

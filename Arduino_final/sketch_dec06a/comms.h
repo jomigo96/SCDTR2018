@@ -25,16 +25,16 @@ typedef struct msg{
 	uint8_t address; // 1 byte
 	uint8_t aux1; // 1 byte
 	uint8_t aux2; // 1 byte
-	float value[4]; // 4 x 4 = 16 bytes
+	float value[3]; // 4 x 4 = 12 bytes
 
-}message_t; //size fixed to 20 bytes
+}message_t; //size fixed to 16 bytes
 
 extern message_t inc_message, out_message;
 extern byte message_received;
 
 void receiveEvent(int c){ //Function that is called when a I2C message is received
 
-	char buf[20]; //Local buffer
+	char buf[16]; //Local buffer
 	int i=0;
 
 
@@ -42,8 +42,9 @@ void receiveEvent(int c){ //Function that is called when a I2C message is receiv
 		buf[i]=Wire.read();
 		i++;
 	}
-	if((uint8_t)buf[0] == sampling_time_data)
+	if((uint8_t)buf[0] == sampling_time_data){
 		return; // No need for this
+	}
 
 	memcpy(&inc_message, buf, sizeof(message_t)); 
 	
@@ -56,7 +57,6 @@ void receiveEvent(int c){ //Function that is called when a I2C message is receiv
 	Serial.println(inc_message.value[0]);
 	Serial.println(inc_message.value[1]);
 	Serial.println(inc_message.value[2]);
-	Serial.println(inc_message.value[3]);
 	Serial.println(inc_message.aux1);
 	Serial.println(inc_message.aux2);
 #endif
@@ -74,7 +74,6 @@ void send_message(){
 	Serial.println(out_message.value[0]);
 	Serial.println(out_message.value[1]);
 	Serial.println(out_message.value[2]);
-	Serial.println(out_message.value[3]);
 	Serial.println(out_message.aux1);
 	Serial.println(out_message.aux2);
 #endif
@@ -82,7 +81,7 @@ void send_message(){
 }
 
 inline void send_sample_time_data(const byte &address, const int &dimming, const int &lower_bound,
-				const float &L, const float &o1, const float &target, const float& c){
+				const float &L, const float &target, const float& c){
 
 #ifdef TIMING
 	long t1, t2;
@@ -94,9 +93,8 @@ inline void send_sample_time_data(const byte &address, const int &dimming, const
 	out_message.aux1 = dimming;
 	out_message.aux2 = lower_bound;
 	out_message.value[0] = L;
-	out_message.value[1] = o1;
+	out_message.value[1] = c * dimming * 2.55;
 	out_message.value[2] = target;
-	out_message.value[3] = c * dimming * 255.0;
 
 	send_message();
 
