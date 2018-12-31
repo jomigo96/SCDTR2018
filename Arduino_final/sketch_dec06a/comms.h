@@ -25,7 +25,7 @@ typedef struct msg{
 	uint8_t address; // 1 byte
 	uint8_t aux1; // 1 byte
 	uint8_t aux2; // 1 byte
-	float value[3]; // 4 x 4 = 12 bytes
+	float value[3]; // 4 x 3 = 12 bytes
 
 }message_t; //size fixed to 16 bytes
 

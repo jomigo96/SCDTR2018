@@ -270,7 +270,7 @@ int run_calibration(int mode){
 	
 		if(isr_flag){
 			count++;
-			if(count > 600){
+			if(count > 50){
 				flag_3s=true;
 				count=0;
 			}
