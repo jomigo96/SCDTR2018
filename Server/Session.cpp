@@ -1,3 +1,15 @@
+/*!
+ * @file Session.cpp
+ * @author João Gonçalves, Daniel Schiffart, Francisco Castro
+ * @date 12 Jan 2019
+ * 
+ * @brief Session implementation file
+ *
+ * This file is not wrapped to 80 characters for clarity, due to the callback 
+ * style used.
+ *
+ * */
+
 #include "Session.hpp"
 
 Session::Session(boost::asio::io_service& ios):
@@ -96,7 +108,7 @@ void Session::send_reply(){
                             write_strand.wrap(boost::bind(&Session::handle_write,
                                                           this,
                                                           shared_from_this(),
-                                                            boost::asio::placeholders::error,
+                                                          boost::asio::placeholders::error,
                                                           boost::asio::placeholders::bytes_transferred
                                                       )));
 }

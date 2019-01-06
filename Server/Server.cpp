@@ -1,3 +1,12 @@
+/*!
+ * @file Server.cpp
+ * @author João Gonçalves, Daniel Schiffart, Francisco Castro
+ * @date 12 Jan 2019
+ * 
+ * @brief Server implementation file
+ *
+ * */
+
 #include "Server.hpp"
 
 Server::Server(boost::asio::io_service& ios):
@@ -20,7 +29,8 @@ void Server::start_sever(uint16_t port){
                         });
 }
 
-void Server::handle_accept(std::shared_ptr<Session> session, const boost::system::error_code& err){
+void Server::handle_accept(std::shared_ptr<Session> session, 
+                                         const boost::system::error_code& err){
 
     if(!err){
         session->start();
