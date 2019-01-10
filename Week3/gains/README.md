@@ -2,7 +2,7 @@
 
 Usa-se o data4 para calcular o ganho e a constante de tempo. Correr com
 ```
-Rscript gains.R
+Rscript model_estimation.R
 ```
 
 ## output

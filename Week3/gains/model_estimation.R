@@ -67,3 +67,16 @@ print(gain)
 tau <- mean(out[3:5, "tau-i"])/10^6
 print("Time constant: [s]")
 print(tau)
+
+# Script output:
+#   led final-value    gain-i tau-i
+# 1   0    1.279038        NA    NA
+# 2  50   55.524735 1.1104947 33612
+# 3 100   98.210044 0.9821004 17008
+# 4 150  135.046597 0.9003106 11336
+# 5 200  168.184207 0.8409210  5664
+# [1] "Gain: [lux] / [led_power]"
+# [1] 0.9077774
+# [1] "Time constant: [s]"
+# [1] 0.011336
+
