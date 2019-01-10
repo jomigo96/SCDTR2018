@@ -1,0 +1,4 @@
+\begin{tikzpicture}
+    \node (start) at (0,0) [rectangle,draw] {Digital Output};
+    \path [draw] (start) -- ++(3,0) to[empty led] ++(0,-3) node [ground] {};
+\end{tikzpicture}

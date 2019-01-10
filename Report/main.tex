@@ -1,8 +1,22 @@
-% arara: xelatex: { shell: yes, synctex: yes }
+% arara: xelatex: { shell: yes}
+% biber
+% arara: xelatex: { shell: yes}
+% arara: xelatex: { shell: yes}
+
 \RequirePackage[l2tabu, orthodox]{nag}
 \documentclass[english,fira]{ist-report}
 
 \input{preamble}
+\DeclareSIUnit{\lux}{LUX}
+
+
+%\usepackage[sfdefault]{FiraSans}
+%\renewcommand*\oldstylenums[1]{{\firaoldstyle #1}}
+%\usepackage[mathrm = sym]{unicode-math}
+%\setmathfont[
+%    Path = ./fonts/,
+%    Extension = .otf]{FiraMath-Regular}
+%\usepackage{FiraMono}
 
 \title{Distributed Real-Time Control Systems}
 
@@ -17,7 +31,7 @@
 
 \setminted[c]{linenos, frame = leftline, breaklines}
 
-\newrobustcmd*{\matr}[1]{\symbf{#1}}
+\newrobustcmd*{\matr}[1]{\symbf{#1}}%{\mathbf{#1}}
 \newrobustcmd*{\ccode}[1]{\mintinline{c}{#1}}
 
 \newrobustcmd*{\ccheckmark}{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;} 
@@ -41,7 +55,7 @@
 	{\Large Distributed Real-Time Control Systems Final Project}
 	
 	\vspace*{43.5mm}
-	{\Large \begin{tabular}{l r} Daniel de Schiffart & \texttt{81479} \\ João Gonçalves & \texttt{81040} \\ Francisco Castro & \texttt{78655}\end{tabular}}
+	{\Large \begin{tabular}{l r} Daniel de Schiffart & \textbf{81479} \\ João Gonçalves & \textbf{81040} \\ Francisco Castro & \textbf{78655}\end{tabular}}
 	
 	\vspace{\fill}
 	{\large Distributed Real-Time Control Systems}
@@ -57,18 +71,383 @@
 \setcounter{page}{1}
 
 \begin{abstract}
-	In this technical report we will present the design and development of a LED-powered office illumination system that implements distributed real-time control to maintain comfortable levels of luminance for its users. We will discuss the approaches done to the modelling of each sensor and corresponding LED and its individual control system, the method of communication between all connected sensor-LED pairs (henceforth referred to as desks), the interaction between the lights emitted by each desk and their joined effort to reduce lighting costs and maximize user comfort, and the gathering of relevant data for diagnostics.
+	In this technical report we will present the design and development of a LED-powered office illumination system that implements distributed real-time control to maintain comfortable levels of illuminance for its users. We will discuss the approaches done to the modelling of each sensor and corresponding LED and its individual control system, the method of communication between all connected sensor-LED pairs (henceforth referred to as desks), the interaction between the lights emitted by each desk and their joint effort to reduce lighting costs and maximize user comfort, and the gathering of relevant data for diagnostics.
+	\newline
+	
+	\textit{\textbf{Keywords:}} Smart Office Illumination, Cooperative Distributed Control, Consensus Algorithm, Serial Communication, Arduino, Raspberry Pi, C++.
 \end{abstract}
 
 {\hypersetup{linkcolor = black} \tableofcontents}
 
 \section{Introduction}
 
+In the last decade, the implementation of LED illumination systems has proven to be a low-energy consumption system in comparison to traditional approaches. As a consequence, this system is also low-cost, which has made possible to apply this kind of illumination devices on cars, offices and homes.
 
+The adaptability of LED illumination systems has been used to improve energy optimization and comply with comfort levels. Distributed control systems have been presented as a possible solution for the problem, by keeping control of the occupation status of spaces and the illuminance values on them, taking into account external illumination levels.
 
+In this project, a simple office-like scenario was considered. The considered approach to achieve the specifications stated above, rely on implementing luminance sensors (LDR) on each desk, as well as light emitting diodes (LED). Communication between each luminaire is also thought to be a key part on achieving a suitable real-time cooperative control system. Moreover, a distributed optimization algorithm (\textit{Consensus} algorithm) is also a key tool on the way to achieve the lowest possible energy consumption state.
+
+In this project, the simulation of such a scenario was achieved by considering each \textit{desk} to be composed by a LED, a LDR, a presence sensor (buttons) and communicational elements (Arduino). The entire office will be simulated by joining every \textit{desk} together inside a cardboard box. For simplicity reasons, two desks were considered throughout the project. Energy minimization will be achieved by controlling the dimming level of each LED, so that the luminance levels on each desk are higher than a certain value (HIGH) or lower than another (LOW). These values were defined in the development phase (chapter \ref{development}). 
+
+The first part of the project (chapter \ref{development}) is devoted to the implementation of a control system in only one \textit{desk}, whose goal is to set the dimming level to a reference value, read illuminance values with the LDR sensor and get good dimming level change responses.
+
+In the second part (chapter \ref{feedback control}), a second \textit{desk} was added to the scenario, whose main goals are to ensure communication between \textit{desks}, achieve suitable illuminance optimization levels and to allow the access of many different kinds of data by many clients through a server, to be placed on a Raspberry PI module.
+
+In the remaining sections of the report, the results obtained with the cooperative distributed control system are presented and discussed.
 
 \pagebreak
+\section{Background and Concepts} \label{background_concepts}
+
+In this section, some basic concepts introduced in classes which were useful for the project implementation are briefly described.
+
+\subsection{Distributed Control}
+
+A distributed decentralized coordinated control system, with explicit communication is used in on the project. This means there may be multiple controllers, where \textit{every controller makes a decision for it's own behaviour and the resulting system behaviour is the aggregate response} (decentralized). \textit{Each node communicates with the others} by explicit communication, \cite{slides}. 
+
+\subsection{Illuminance models}\label{sec:light}
+
+The illuminance metric used to characterize the dimming level on each \textit{desk} is \si{\lux}. One \si{\lux} is equal to one \SI{1}{\lumen\per\meter\squared} (lumen per meter square). One \si{\lumen} characterizes the \textit{light produced by a light source emmiting \SI{1}{\candela} (candela) over \SI{1}{\steradian} (steradian)}. Finally, a \si{\steradian} is the solid angle of a sphere section area, given by the division between the area of that surface and the sphere radius. A \si{\candela} is equal to \SI[quotient-mode=fraction]{1/683}{W} \textit{of green light per \si{\steradian} in a given direction}, \cite{slides}.
+
+The luminous power incident on a surface is measured in \si{\lux}. The luminous flux of light emitted by a source is expressed in \si{\lumen}. The luminous intensity is expressed in \si{\candela}.
+
+\subsection{Hardware concepts}
+
+Each Arduino is responsible for processing and transmitting data at each node. The voltage for each LED is generated with a PWM (Pulse Width Modulation) signal, according to the reference voltage required. A PWM signal is a sequence of ones and zeros whose duration of each section is defined by a duty cycle (proportional to the analog voltage). The value read by each LDR sensor is also received by the respective Arduino.
+
+Serial communication between Arduinos (nodes) is ensured by the I2C communication method, where each Arduino may be a master or slave. \textit{A master can send data or request data from slaves, and a slave can read data or send data to the master}.
+
+The Raspberry PI (henceforth referred to as RPI) module will read from the I2C bus. This bus collects data from the inter-node communications. The RPI will connect to the I2C bus in read-only mode and collects all messages transmitted in the bus for analysis 
+
+\section{Related Work}
+
+
+
+\section{Development} \label{development}
+
+\subsection{Illuminance measurement}
+
+The luminaire node uses a light-dependant resistor (LDR) to measure illuminance, which is a non-linear component. 
+Its resistance is approximately linear with illuminance in logarithmic units, and manufacturers provide a range of resistance for each illuminance value, as shown in figure \ref{fig:ldr-characteristic}.
+The relationship between resistance, $R$, and illuminance, $L$, is given by:
+\begin{align}
+    \log_{10} R = m \log_{10} L + b, \label{eq:r-l-log}
+\end{align}
+with $m$ and $b$ being particular to each LDR, and are estimated with linear regression, see attached file \texttt{calibration.R}.
+
+The resistance in turn is measured on a resistance divisor, as seen in figure \ref{fig:ldr-circuit}, and illuminance is computed as:
+\begin{align}
+\begin{aligned}
+    R &= \frac{V_{cc} - v}{v/R_{aux}}\\
+    L &= 10^{\frac{log_{10}R-b}{m}}, 
+\end{aligned}
+\label{eq:L-calc}
+\end{align}
+where $V_{cc}$ is \SI{5}{\volt}, $R_{aux}$ is \SI{10}{\kilo\ohm} and $v$ is the measured voltage, which is necessarily in the range $[0-5]\SI{}{\volt}$. The capacitor helps to mitigate noise in the circuit.
+
+\begin{figure}[ht]
+    \centering
+    \missingfigure[]{LDR datasheed graph}
+    \caption{LDR illuminance-resistance characteristic.}
+    \label{fig:ldr-characteristic}
+\end{figure}
+\begin{figure}[ht]
+    \centering
+    \input{graphics/ldr_circuit.tikz}
+    \caption{LDR measuring circuit}
+    \label{fig:ldr-circuit}
+\end{figure}
+
+
+\subsection{LED actuation}
+
+The LED is driven by a digital pin with a pulse width modulation (PWM) signal, to emulate an analog output.
+The frequency of the PWM signal is increased to \todo{implement this} to avoid the switching to be picked-up by the illuminance sensor, and cause unnecessary noise.
+\todo[inline]{Design an experiment for this}
+
+\subsection{Dynamical system modelling}
+
+As discussed in section \ref{sec:light}, illuminance at any point changes instantly when a light source changes its radiated power.
+However, in measured illuminance, there is a dynamic response, which is a property of the electric circuit that measures it. 
+In particular, there is a delay, $\tau$, that should be estimated.
+
+For a single luminaire node, there is a light source, the LED, and a sensor, the LDR, with a certain characteristic reflection path. The dynamic model of the measured illuminance to the LED power is assumed to be 1st order linear, as:
+\begin{align}
+    \frac{L(s)}{P(s)} = \frac{K_0(x)}{1+s\tau(x)},
+\end{align}
+where $L(s)$ and $P(s)$ are the Laplace transforms of the measured illuminance and LED power respectively. $K_0$ and $\tau$ are a gain and time constant, a function of $x$ to symbolize that they depend on the environment, through a specif reflection path setup.
+
+To be noted that the model in equation \ref{eq:model} is BIBO-stable.
+
+Experimentally, the LED is driven by step signals and the illuminance is measured, in order to estimate $\tau$ and $K_0$ for a common operation condition (box closed, see figure \ref{fig:steps}). The value of $K_0$ was used in earlier stages to drive the feed-forward controller, although a better methodology to estimate this gain for a multi-node configuration is described in section \ref{sec:calibration}. The value of $\tau$ is measured to be \SI{20}{\milli\second}, and will influence the choice of sampling time. It is also verified that $\tau \approx RC$ for this circuit. See attached file \texttt{model\_estimation.R}.
+
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}
+    	\begin{axis}[xlabel = {Time (\si{\micro\second})}, ylabel = {Voltage (\si{\milli\volt})}, grid = both,]
+    		\addplot [red] table [col sep = comma, x index = 1, y index = 0, mark = none] {data4.csv};
+    		\addplot [blue, y filter/.code={\pgfmathparse{#1 * 15}\pgfmathresult}] table [col sep = comma, x index = 1, y index = 2, mark = none]{data4.csv};
+    	\end{axis}
+    \end{tikzpicture}
+    \caption{Measured illuminance for step actuation in the LED, box closed.}
+    \label{fig:steps}
+\end{figure}
+
+
+\subsection{Individual luminaire controller}
+
+The purpose of the controller is to actuate on the system in order to have the illuminance $L$ to follow a reference value $L_{ref}$. In this section, $L$ represents the physical illuminance, i.e. the true value, while $\Tilde{L}$ represents measured illuminance. The control signal is the LED duty cycle, represented here as $u$.
+
+The controller is implemented with a feedback component and a feed-forward component, described separately.
+
+\subsubsection{Feed-forward control}
+
+The feed-forward control aims to set a constant actuation by predicting the necessary value so that the output converges to the reference value. 
+It has the advantage of not requiring sensors and being fast, and in this problem it is used to speed-up the response of the feedback-only controlled system. 
+For usage, it requires that the system is open-loop stable, and also requires precise modelling, and its 
+main disadvantage is that it cannot reject disturbances, or completely remove steady-state error.
+
+With the available model in equation \ref{eq:model}, it is clear that a feed-forward controller can be used, by having simply:
+\begin{align}
+    C_{ff}(s) \equiv \frac{u(s)}{L_{ref}} = \frac{1}{K_0},
+    \label{eq:ff}
+\end{align}
+so that the system response is:
+\begin{align}
+    \Tilde{L}(s) = \frac{L_{ref}}{1+s\tau}, 
+    \label{eq:response-ff}
+\end{align}
+which settles to the steady-state value $L_{ref}$.
+
+\section{Feedback control} 
+\label{feedback control}
+
+A feedback controller is required to eliminate steady-state error and reject disturbances. 
+The usage, however, introduces delay and subjects the system to noise from the sensor. 
+It is also important to verify that stability is maintained.
+
+For this problem, the used controller is a proportional-integrative controller (PI). 
+
+The proportional term penalizes error, $e$, the difference between the measured value and the reference, getting the actuation closer to the required value.
+
+The integral term integrates the error in order to remove it in steady-state, however it must always be combined with proportional control as it slows the system and deteriorates stability.
+
+A derivative term is skipped, as it is amplifies high-frequency noise, especially after dicretization.
+Its purpose is to penalize oscillations and stabilize the response faster, but the plant is not prone to oscillations itself, and the feed-forward controller helps speed-up the response.
+
+Additionally, the PI algorithm implemented is a \emph{velocity algorithm}, as described in \cite{bennett1994real}, since the actuation in equilibrium is not $0$ for this system. It consists in calculating the velocity of change in control, $\Dot{u}$ with a PID controller, in this case just PI, such as:
+\begin{align}
+    C_{fb}(s) \equiv \frac{U(s)}{E(s)} = \frac{1}{s}K_P\left( 1 + \frac{K_I}{s} \right),
+    \label{eq:fb}
+\end{align}
+with $E(s) \equiv L_{des}(s)-\Tilde{L}(s)$, and $K_I$, $K_P$ gains to be chosen. $L_{des}$ is the "desired illuminance", covered next.
+
+\todo[inline]{Choose gains}
+
+\subsubsection{Feed-forward and feedback control}
+
+The controllers are joined as shown in figure \ref{fig:ff+fb}. 
+Normally, the feedback controller receives a reference value, like $L_{ref}$, however, with the usage of a feed-forward term, we already expect a certain response, and from the feedback controller it is only needed that the system loosely follows that first order response to the reference value.
+Therefore, a \emph{predictor} is used to provide the feedback controller with a desired illuminance at each time, $L_{des}$. 
+
+The value of $L_{des}$ can be predicted by converting equation \ref{eq:response-ff} to the time domain, considering that the reference value in this problem always varies in steps. 
+Let $L_{ref}$ be the current reference and $L_{prev}$ the previous (constant) reference, and $t_0$ the instant when the reference changes. Then:
+\begin{align}
+    L_{des}(t) = L_{ref} - \left( L_{ref}-L_{prev} \right)\exp\left(-\frac{t-t_0}{RC}\right).
+    \label{eq:predictor}
+\end{align}
+Obviously, $L_{des} \rightarrow L_{ref}$, as is expected in steady state.
+
+\begin{figure}[ht]
+    \centering
+    \resizebox{\linewidth}{!}{\input{graphics/fffb.tikz}}
+    \caption{Feed-forward + feedback architecture. $w$ is disturbances, $n$ is sensor noise.}
+    \label{fig:ff+fb}
+\end{figure}
+
+\subsubsection{Discretization}
+
+The controller must be discretized in order to be implemented in the Arduino board. A fixed sampling time of $h=\SI{5}{\milli\second}$ is chosen, as it proved difficult to execute the calculations with smaller periods, although it should be noted that it is still large when compared with the characteristic time constant.
+
+The integral controller is discretized using the Tustin transformation, which maps stable continuous-time poles to the inside of the unit circle in discrete-time, preserving stability. Additionally, it places a zero at $z=-1$ which attenuates noise, and suffers no delay. 
+The result is:
+\begin{align}
+    i[k] = i[k-1] + \frac{h}{2}\left( e[k] + e[k-1] \right).
+    \label{eq:integral-tustin}
+\end{align}
+
+The other integral which converts $\Dot{u}$ to $u$ is implemented with a backward  difference:
+\begin{align}
+    u[k] = u[k-1] + h\left( K_P (1+K_I i[k]) \right).
+\end{align}
+
+\subsubsection{Implementation}
+
+For implementation in the luminairs, some additions are made:
+\begin{enumerate}
+    \item A 3-sample median filter is added to the sensor output, taking 3 measurements every control loop. This reduces sensor noise even further at a low computational cost.
+    \item An error deadzone is added, to prevent flicker when the illuminance is still close to the reference value. The deadzone behaves as:
+    \begin{align}
+        e = 
+        \begin{cases}
+            e-\epsilon, & \text{if } e>\epsilon \\
+            0,          & \text{if } -\epsilon<e<\epsilon \\
+            e+\epsilon  & \text{if } e<-\epsilon,
+        \end{cases}
+        \label{eq:deadzone}
+    \end{align}
+    where $\epsilon$ is set to a value in \SI{}{\lux} corresponding to the resolution interval of this signal.
+    \item An anti-windup mechanism is added, by cancelling integration. This prevents windup when the actuator saturates, and greatly improves performance, for example when the box is opened and closed.
+    \item Branching is kept to a minimum, and only important operations are done before the for the current actuation is set. In particular, writing to serial monitor and anti-windup are done after \texttt{analogWrite}. This minimizes the computation delay and also jitter. 
+\end{enumerate}
+
+The final controller is present in annexed file \texttt{controller.h} as a class method. Algorithm \ref{al:controller} describes the controller. In this, $d$ is a \textit{reference dimming}, obtained from the distributed algorithm as described in section \ref{sec:distr}.
+
+\begin{algorithm}[ht]
+  \caption{PI + feed-forward control algorithm, called by an interrupt with period \SI{5}{\milli\second}.}
+  \label{al:controller}
+  \begin{algorithmic}[1]
+    \Require $L_{ref}$, $d$
+    \State $s \gets $\Call{median3}{\textit{3 measurements from sensor}}
+	\State $L \gets $\Call{compute\_lux}{$s$}
+	\State $ff \gets d$
+	\State $L_{des} \gets $\Call{simulator}{}
+	\State $e \gets $\Call{deadzone}{$L_{des}-L$}
+	\State $i \gets i + \frac{h}{2}(e+e_{prev})$
+	\State $u \gets u + h \cdot K_P (1+K_I i)$
+	\State \Call{Write}{$u+ff$}  \Comment{Actuation}
+	\If{$u+ff$ is saturated}     \Comment{Anti-windup}
+	    \State $i \gets i - \frac{h}{2}(e+e_{prev})$
+	\EndIf
+	\State $e_{prev} \gets e$
+  \end{algorithmic}
+\end{algorithm}
+
+\subsection{Inter-node communications} \label{sec:comms}
+
+Arduino nodes communicate via I2C bus. The communication protocol consists of a fixed message size, with a control byte for defining the contents of the data. From \texttt{comms.h}:
+\begin{minted}[linenos, firstnumber = 19, frame = leftline]{c}
+enum MsgCode : uint8_t{
+
+    calibration_request,
+    data,
+    cont,
+    acknowledge,
+    consensus_data,
+    consensus_stop,
+    consensus_new,
+    sampling_time_data,
+    none,
+};
+\end{minted}
+\begin{minted}[linenos, firstnumber = 35, frame = leftline]{c}
+typedef struct msg{
+    MsgCode code;    //!< Message code
+    uint8_t address; //!< Sender's I2C address
+    uint8_t aux1;    //!< field for data
+    uint8_t aux2;    //!< field for data
+    float value[3];  //!< field for data
+
+}message_t;
+\end{minted}
+The message is fixed to 16 bytes which is the maximum size usable by the PigPio library on the Raspberry Pi.
+All messages are sent as broadcasts, some are for logging purposes while others are used by the distributed control algorithm and calibration procedures. The purpose of the message is identified by its code, and the nodes are permanently listening for incoming messages. The code also identifies what variables are sent on the data fields.
+
+Physically, the bus is a line between the Arduinos' SDA and SCL pins, which operates at logical levels \SI{0}{\volt} - \textit{LOW} and \SI{5}{\volt} - \textit{HIGH}. 
+The Raspberry, however, has logical levels \SI{0}{\volt} - \textit{LOW} and \SI{3.3}{\volt} - \textit{HIGH}, therefore the connection is made with resistors to provide appropriate voltage drop, as shown in figure \ref{fig:i2c}.
+
+\begin{figure}[ht]
+	\centering
+	\resizebox{0.5\linewidth}{!}{\input{graphics/setup.tikz}}
+	\caption{Arduino and Raspberry Pi setup.}
+	\label{fig:i2c}
+\end{figure}
+
+\subsection{Distributed control} \label{sec:distr}
+
+\subsection{Model calibration} \label{sec:calibration}
+
+The illuminance at each \textit{desk} follows the model:
+\begin{gather}
+  L = K \matr{d} + \matr{o} \nonumber \\ 
+  \left[\begin{array}{c} l_{1}\\ l_{2} \end{array}\right] =
+  \left[\begin{array}{cc}
+	k_{11} & k_{12}\\
+	k_{21} & k_{22}
+  \end{array}\right]
+  \left[\begin{array}{c} d_{1}\\ d_{2}\end{array}\right]+
+  \left[\begin{array}{c} o_{1}\\ o_{2} \end{array}\right]
+  \label{eq:model}
+\end{gather}
+where $l_i$, $d_i$ and $o_i$ are the illuminance, LED power (in percentage) and background illuminance at desk $i$, respectively. The purpose of the calibration is to find the values for $k_{ij}$ and $o_i$ for a given office layout.
+
+The calibration is performed by turning the luminairs synchronously and taking measurements. One node takes initiative and sends a message to trigger the process. First, both LEDs are switched off and $o_i$ is measured.
+Then, node 2 turns on its LED, measures the resulting illuminance and computes $k_{22}$, and sends the illuminance to node 1. Receiving this value, node 1 can also measure its illuminance and compute $k_{21}$. The operation inverts and $k_{12}$ and $k_{11}$ are determined. In the end, nodes share the results.
+
+\subsubsection{Implementation details}
+
+The previous procedure is implemented as its own module, with a special communication protocol. The flow chart in figure \ref{fig:calib} illustrates messages sent and summarizes the finite-state machine.
+Between changing the LED state and taking measurements, the nodes must sleep, to guarantee that the measurement is taken in steady state. For this, they were set to sleep for a length of time $10$ times the value of the system time constant, $\SI{10}{} \times \SI{20}{\milli \second} = \SI{0.2}{\second}$. 
+
+It also should be noted that internally, the nodes are not distinguishable as 1 and 2. Each considers itself node 1 and the peer as 2, so the representation of the coupling matrix $K$ is transposed by both diagonals, and identically $o_1$ and $o_2$ are swapped.
+
+\subsection{Data server}
+
+Each Arduino sends a message to the implemented data server each sampling period with the relevant information about its current state, which the data server processes and stores accordingly.
+
+The data stored by the data server was balanced as to contain all the data that satisfies the project's client requirements but also to allow the message transmitted to be as short as possible. For reference, the client requirements for any desk $i$ can be found in table \ref{tab:client}.
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{c c}\toprule
+        \textbf{Single-sample variables}        & \textbf{Cumulative variables} \\
+        \midrule
+        Illuminance             & \\
+        
+        \bottomrule
+    \end{tabular}
+    \caption{Caption}
+    \label{tab:client}
+\end{table}
+
+As it is currently defined, each Arduino transmits messages using a format described in section \ref{sec:comms}. From that very section we can see \ccode{enum MsgCode} which describes the different types of messages transmitted, and only a select group of these formats can be accepted by the data server.
+
+The main format, \ccode{sampling_time_data}, contains the data included
+
+\begin{table}[ht]
+	\centering
+	\begin{tabular}[h]{l|l}\toprule
+		\ccode{address} & Arduino's I$2$C address. \\
+		\ccode{aux1}    & 1st MSB: Desk occupancy state ($1$ for occupied, $0$ for free). \\
+		\midrule
+		                & \textbf{Next 7 bits, led duty cycle, unsigned integer from $0$ to $100$.} \\
+		\midrule
+		\ccode{aux2}    & Illuminance lower bound (presumably $40$ or $80$), in LUX. \\
+		\ccode{value[0]}& Measured illuminance, in LUX. \\
+		\ccode{value[1]}& Local background illuminance, in LUX. \\
+		\ccode{value[2]}& Instantaneous control illuminance reference, in LUX. \\
+		\ccode{value[3]}& Instantaneous power consumption, units to be defined. \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+While the instantaneous data is sent through by the Arduinos and can be accessed in its corresponding moment by the client, the server is in charge of storing the history since start-up and the cumulative variables throughout the server program's lifetime.
+
+% Esta a espera do sinal da calibracao para fazer reset (calibration_request)
+% Aceita data para ir buscar os backgrounds no final da calibracao
+% sampling time data
+
+\section{Experiments}
+
+\section{Results}
+
+\subsection{Discussion}
+
+\section{Conclusion}
+
+\pagebreak
+
 \appendix
+\nocite{consensusbernardino}
+\printbibliography[heading = bibnumbered]
 
 \todo[inline]{Mencionar que toda a implementação é feita para 2 nodes, apesar de ser tudo extensível, blah blah}
 
@@ -79,7 +458,7 @@ This should be the report structure according to the class slides (Distributed R
 	\item[Abstract] A summary in less than 200 words;
 	\item[Introduction] Motivation, challenges, main idea, objectives, outline;
 	\item[Background/Concepts] Common knowledge required;
-	\item[Related Work] State-of-the-art;\todo[inline]{I vote for self driving cars}
+	\item[Related Work] State-of-the-art;
 	\item[Development] Your approach, methodologies, innovations;
 	\item[Experiments] Carefully explain the design of the experiments;
 	\item[Results] Illustrate and comment on the results of experiments;
@@ -135,7 +514,7 @@ Documentation notes from stage 1.
 Documentation notes from stage 2. \\
 \textit{``In your report, please do not forget to address the following issues''}
 \begin{description}
-	\item[I2C communications] Indicate the average time required to send a request message and receive an answer.
+	\item[I$2$C communications] Indicate the average time required to send a request message and receive an answer.
 	\item[C++ classes, sockets, parallelism] Indicate the C++ classes that are most relevant for coding the server running on the PC interfacing to the Arduinos.
 	\item[Sockets] List the number of sockets used to implement the server. Describe the functions of the sockets.
 	\item[Concurrency] Indicate the methodologies used in the server to implement parallelism in order to process requests from multiple clients.
@@ -143,49 +522,15 @@ Documentation notes from stage 2. \\
 	\item[Experiments] Perform experiments to compare results between the cooperative distributed contrller and the non-cooperative controller (independent local controllers). Plot the time response of both controllers in similar situations and create a table with their performance metrics.
 \end{description}
 
-
-\section{Raspbian Startup}
-\begin{enumerate}
-	\item Open console
-	\item \texttt{sudo ifconfig enp2s0f0 10.0.0.2 netmask 255.255.255.0}
-	\item Configure by hand on Ubuntu wired connection settings
-	\begin{enumerate}
-		\item Details -> Disable \textit{Connect Automatically}
-		\item IPv4 -> \textit{IPv4 Method} to \textit{Manual}
-		\item Set address to \texttt{10.0.0.2} and gateway to \texttt{255.255.255.0}
-	\end{enumerate}
-	\item Run \texttt{ssh pi\@10.0.0.1} and use \texttt{raspberry} as password
-\end{enumerate}
-
 \paragraph{Importante} Antes de desligar o Raspberry Pi, correr \texttt{sudo shutdown -h now} para evitar corrupção do sistema operativo.
 
 \section{Illumination system calibration}
 
 \subsection{Principles of the calibration procedure}
 
-The illuminance at each desk follows the model
-\begin{gather}
-  L = K \matr{d} + \matr{o} \nonumber \\ 
-  \left[\begin{array}{c} l_{1}\\ l_{2} \end{array}\right] =
-  \left[\begin{array}{cc}
-	k_{11} & k_{12}\\
-	k_{21} & k_{22}
-  \end{array}\right]
-  \left[\begin{array}{c} d_{1}\\ d_{2}\end{array}\right]+
-  \left[\begin{array}{c} o_{1}\\ o_{2} \end{array}\right]
-  \label{eq:model}
-\end{gather}
-where $l_i$, $d_i$ and $o_i$ are the illuminance, LED power (in percentage) and background illuminance at desk $i$, respectively. The purpose of the calibration is to find the values for $k_{ij}$ and $o_i$ for a given office layout.
 
-The calibration is performed by turning the lumiaires synchronously and taking measurements. One node takes initiative and sends a message to trigger the process. First, both LEDs are switched off and $o_i$ is measured.
-Then, node 2 turns on its LED, measures the resulting illuminance and computes $k_{22}$, and sends the illuminance to node 1. Receiving this value, node 1 can also measure its illuminance and compute $k_{21}$. The operation inverts and $k_{12}$ and $k_{11}$ are determined. In the end, nodes share the results.
 
-\subsection{Implementation detais}
 
-The previous procedure is implemented as its own module, with a special communication protocol. The flow chart in figure \ref{fig:calib} illustrates messages sent and summarizes the finite-state machine.
-Between changing the LED state and taking measurements, the nodes must sleep, to guarantee that the measurement is taken in steady state. For this, they were set to sleep for a lenght of time 10 times the value of the system time constant, $10 \times \SI{5}{\milli \second} = \SI{50}{\milli \second}$. 
-
-It also should be noted that internally, the nodes are not distinguishable as 1 and 2. Each considers itself node 1 and the peer as 2, so the representation of the coupling matrix $K$ is transposed by both diagonals, and identically $o_1$ and $o_2$ are swapped.
 
 \section{Optimização do Sistema Distribuído}
 
@@ -294,19 +639,11 @@ I might have missed something, we'll see.
 
 \begin{figure}[ht]
 	\centering
-	\input{graphics/setup.tikz}
-	\caption{Arduino and Raspberry Pi setup.}
-\end{figure}
-
-\begin{figure}[ht]
-	\centering
 	\input{graphics/calib.tikz}
-	\caption{Calibration procedure. Used $T$=\SI{0.5}{\second}.}
+	\caption{Calibration procedure.}
 	\label{fig:calib}
 \end{figure}
 
-\pagebreak
-\printbibliography
-
 \listoftodos
+
 \end{document}

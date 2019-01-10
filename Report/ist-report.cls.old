@@ -21,7 +21,7 @@
 
 % ---------------- Identification ----------------
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{ist-report}[2018/12/30 v0.7.4 Unofficial IST report class]
+\ProvidesClass{ist-report}[2018/12/20 v0.7.2 Unofficial IST report class]
 
 % ----------------- Initial Code -----------------
 \typeout{_____________________________________________________________________________}
@@ -85,10 +85,7 @@
 
 % Define option hierarchy and set conflict resolution
 \ifbool{@purist}
-	{ \boolfalse{@minimal} \boolfalse{@twocolumn} \boolfalse{@palatino} \boolfalse{@fira} }
-	{}
-\ifbool{@fira}
-	{ \boolfalse{@palatino} }
+	{ \boolfalse{@minimal} \boolfalse{@twocolumn} \boolfalse{@palatino} }
 	{}
 \ifbool{@minimal}
 	{ \boolfalse{@twoside} \boolfalse{@twocolumn} }
@@ -107,12 +104,11 @@
 		{ \boolfalse{unicode} }
 }
 
-%\RequirePackage{mathtools}
-\RequirePackage{amsmath}
-\RequirePackage{amssymb}
+\RequirePackage{mathtools}
+
 \RequirePackage{geometry}
 
-% Fix for header and footer margins not updating with renewed margins
+% Fix for header and footer margins not updating with renewed margins %
 \let\Oldgeometry\geometry
 \renewcommand{\geometry}[1]{
 	\Oldgeometry{#1}
@@ -124,6 +120,7 @@
 
 \ifbool{unicode}{
 	\RequirePackage[no-math]{fontspec}
+	\defaultfontfeatures{Ligatures = TeX}
 }{
 	\RequirePackage[utf8]{inputenc}
 	\RequirePackage[T1]{fontenc}
@@ -131,7 +128,6 @@
 
 % === Main font selection ===
 \ifbool{@purist}{
-	\renewcommand{\familydefault}{\sfdefault}
 	\ifbool{unicode}{
 		\setsansfont[
 			Extension = .otf,
@@ -139,33 +135,36 @@
 			BoldFont = *-bold,
 			ItalicFont = *-italic,
 			BoldItalicFont = *-bolditalic]{texgyreheros}
+		\renewcommand{\familydefault}{\sfdefault}
 		\setmonofont[Scale = 1.14]{inconsolata}
+		\RequirePackage{newtxsf}
 	}{
+		\RequirePackage{newtxsf}
 		\RequirePackage{tgheros}
+		\renewcommand{\familydefault}{\sfdefault}
 		\RequirePackage[scaled = 1.14]{inconsolata}
 	}
-	\RequirePackage{newtxsf}
 }{
-	\ifbool{@palatino}{
-		\RequirePackage[osf]{newpxtext}
-		\RequirePackage{eulervm}
-		\RequirePackage[scaled = 1.05]{nimbusmononarrow}
+	\ifbool{@fira}{
+		\booltrue{@purist}
+		\RequirePackage[sfdefault]{FiraSans}
+		\renewcommand*\oldstylenums[1]{{\firaoldstyle #1}}
+		\ifbool{unicode}{
+			\RequirePackage[mathrm = sym]{unicode-math}
+			\setmathfont[
+				Path = ./fonts/,
+				Extension = .otf]{FiraMath-Regular}
+		}{
+			\RequirePackage{newtxsf}
+		}
+		\RequirePackage{FiraMono}
 	}{
-		\ifbool{@fira}{
-    		\booltrue{@purist}
-    		\RequirePackage[sfdefault]{FiraSans}
-    		\renewcommand*\oldstylenums[1]{{\firaoldstyle #1}}
-    		\ifbool{unicode}{
-    			\RequirePackage[mathrm = sym]{unicode-math}
-    			\setmathfont[
-    				Path = ./fonts/,
-    				Extension = .otf]{FiraMath-Regular}
-    		}{
-    			\RequirePackage{newtxsf}
-    		}
-            \RequirePackage{FiraMono}
-        }{
-		    \RequirePackage{lmodern}
+		\ifbool{@palatino}{
+			\RequirePackage[osf]{newpxtext}
+			\RequirePackage{eulervm}
+			\RequirePackage[scaled = 1.05]{nimbusmononarrow}
+		}{
+			\RequirePackage{lmodern}
 		}
 	}
 }
@@ -186,7 +185,7 @@
 		{ \RequirePackage[portuguese]{babel} }
 }
 
-%\RequirePackage{microtype}
+\RequirePackage{microtype}
 \RequirePackage{xcolor}
 \RequirePackage{metalogo}
 \RequirePackage{fancyhdr}
@@ -194,11 +193,11 @@
 \RequirePackage{caption}
 \RequirePackage{tikz}
 
-%\ifbool{@minimal}{
-%	\RequirePackage{multicol}
-%	\AfterEndPreamble{\begin{multicols}{2}}
-%	\AtEndDocument{\end{multicols}}
-%}{}
+\ifbool{@minimal}{
+	\RequirePackage{multicol}
+	\AfterEndPreamble{\begin{multicols}{2}}
+	\AtEndDocument{\end{multicols}}
+}{}
 
 % ------------------ Main Code -------------------
 
@@ -219,20 +218,15 @@
 			foot = 22pt,
 		}
 	}{
-		\ifbool{@fira}{
-			\geometry{a4paper, margin = 2.5cm}
-			\renewcommand\baselinestretch{1.15}
-		}{
-			\geometry{a4paper,
-				includeheadfoot,
-				top = 1cm,
-				bottom = 2cm,
-				hmargin = 3.5cm,
-			}
-			\ifbool{@twoside}
-				{ \geometry{twoside} }
-				{}
+		\geometry{a4paper,
+			includeheadfoot,
+			top = 1cm,
+			bottom = 2cm,
+			hmargin = 3.5cm,
 		}
+		\ifbool{@twoside}
+			{ \geometry{twoside} }
+			{}
 	}
 }
 
@@ -258,78 +252,77 @@
 	\csdef{@subtitle}{Sample Subtitle}
 	\csdef{@subject}{Sample Subject}
 	\csdef{@course}{Sample Degree}
-	\newcommand*\setgroupno[1]{\csdef{@groupno}{Group #1}}
+	\newcommand*\groupno[1]{\csdef{@groupno}{Group #1}}
 }{
 	\csdef{@title}{Título de Exemplo}
 	\csdef{@subtitle}{Subtítulo de Exemplo}
 	\csdef{@subject}{Disciplina de Exemplo}
 	\csdef{@course}{Curso de Exemplo}
-	\newcommand*\setgroupno[1]{\csdef{@groupno}{Grupo #1}}
+	\newcommand*\groupno[1]{\csdef{@groupno}{Grupo #1}}
 }
 
-\newcommand*\settitle[1]{\csdef{@title}{#1}}
-\newcommand*\setsubtitle[1]{\csdef{@subtitle}{#1}}
-\newcommand*\setsubject[1]{\csdef{@subject}{#1}}
-\newcommand*\setcourse[1]{\csdef{@course}{#1}}
-\newcommand*\setinstitution[1]{\csdef{@institution}{#1}}
+\renewcommand*\title[1]{\csdef{@title}{#1}}
+\newcommand*\subtitle[1]{\csdef{@subtitle}{#1}}
+\newcommand*\subject[1]{\csdef{@subject}{#1}}
+\newcommand*\course[1]{\csdef{@course}{#1}}
+\newcommand*\institution[1]{\csdef{@institution}{#1}}
 
 %  == Minimal mode header
 \newrobustcmd\makeheader{
-	%\ifbool{@minimal}{\end{multicols}}{}
+	\ifbool{@minimal}{\end{multicols}}{}
 	\begin{center}
 		\includegraphics[scale=0.3, trim = {93.4pt 219.7pt 77pt 221.9pt}]{IST_C_CMYK_POS}
-
+		
 		\vspace*{3mm}
-		{\huge \textbf{\@title}} \\
+		{\huge \textsc{\@title}} \\
 		\vspace*{4mm}
 		{\LARGE \@subtitle}
 		\vspace*{4mm} \\
 		{\large \@author}
-
+		
 		\vspace*{3mm}
 		{\Large \@coverdate}
 		\vspace*{4mm} \\
 		\rule{\linewidth}{0.5pt}
 	\end{center}
-	%\ifbool{@minimal}{\begin{multicols}{2}}
+	\ifbool{@minimal}{\begin{multicols}{2}}
 }
 
 %  == Cover examples ==
 \newrobustcmd\makecover{
 	\begin{titlepage}
-
+	
 	\begin{center}
 		\vspace*{0.1\textheight}
 		\includegraphics[width = 0.4\linewidth, trim = {172.4pt 202.7pt 172.6pt 201.4pt}, clip]{IST_A_CMYK_POS}
-
+		
 		\vspace*{0.1\textheight}
 		{\huge\bfseries\@title}
-
+		
 		\vspace*{0.01\textheight}
 		\ifcsdef{@subtitle}{\Large\@subtitle}{}
-
+		
 		\vspace*{0.3\textheight}
 		{\Large\begin{tabular}[t]{c}\@author\end{tabular}}
 		{\ifdefempty{\@groupno}{}{\vspace*{0.01\textheight}\\\@groupno}}
-
+		
 		\vspace{\fill}
 		{\large \@subject}
-
+		
 		\vspace*{0.01\textheight}
 		{\Large\@course}
-
+		
 		\vspace*{0.01\textheight}
 		{\large\@institution}
-
+		
 		\vspace*{0.01\textheight}
 		{\@date}
 	\end{center}
-
+	
 	\end{titlepage}
 	\setcounter{page}{1}
 }
 
-\newbool{fullshield}
 %  == Page style examples ==
 \fancypagestyle{default}{
 	\fancyhf{}
@@ -337,17 +330,15 @@
 	\renewcommand\footrulewidth{0pt}
 	\fancyfoot[C]{\raisebox{-8.55pt}{
 		\begin{tikzpicture}[x = 0.053cm, y = 0.05367cm]
-			\coordinate (text) at (0,0);
-			\path (text) ++(-5.5,5.5) coordinate (e1);
-			\path (text) ++(5.5,0.5) coordinate (e2);
-			\path (text) ++(0,-7.5) coordinate (e3);
-			\ifbool{fullshield}{
-				\path [fill, color = {ist-cyan}] (e1) to (e1-|e2) to (e2) to [out = -90, in = 30] (e3) to [out = 150, in = -90] (e1|-e2) to cycle;
-				\node (text_fill) at (0,0) [align = center, inner sep = 0pt] {\color{white} \textbf \thepage};
-			}{
-				\path [thin, draw, color = {black}] (e1) to (e1-|e2) to (e2) to [out = -90, in = 30] (e3) to [out = 150, in = -90] (e1|-e2) to cycle;
-				\node (text_black) at (text) [align = center, inner sep = 0pt] {\thepage};
-			}
+			\coordinate (c1) at (0,0);
+			\coordinate (c2) at (11,0);
+			\coordinate (c3) at (11,-5);
+			\coordinate (c4) at (5.5,-13);
+			\coordinate (c5) at (0,-5);
+			\coordinate (center) at (5.5,-6.5);
+			\coordinate (text) at (5.5,-5.5);
+			\draw [thin, color = {black}] (c1) to (c2) to (c3) to [out = -90, in = 30] (c4) to [out = 150, in = -90] (c5) to cycle;
+			\node (pageno) at (text) [align = center] {\thepage};
 		\end{tikzpicture}}
 	}
 	\ifbool{@twoside}{

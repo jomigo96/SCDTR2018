@@ -2,8 +2,7 @@
 \usepackage{anyfontsize}
 \usepackage{pdflscape}
 
-% -- Funções matemáticas extra
-\usepackage{siunitx}
+
 
 % -- Símbolos extra
 \usepackage{amssymb}
@@ -35,16 +34,26 @@
 \usepackage{pgfplots}
 \usepackage{circuitikz}
 \usetikzlibrary{arrows.meta,positioning,patterns,graphs}
-\pgfplotsset{compat=1.16}
+\pgfplotsset{compat=1.15}
 \pgfplotsset{table/search path = {data}}
 \pgfplotsset{/pgf/number format/use comma,}
 
 % -- Integrar código fonte
 \usepackage{minted}
 \usepackage{verbatim}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 
 % -- Tabelas
 \usepackage{booktabs}
+\usepackage{makecell}
 
 % -- Misc
 \usepackage{todonotes}
+
+% -- Funções matemáticas extra
+\usepackage{siunitx}
+\sisetup{
+  math-ohm=\Omega,
+  text-ohm=\ensuremath{\Omega},
+}

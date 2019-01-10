@@ -96,7 +96,7 @@ public:
      * @brief PID control, sensing and actuation
      *
      * Follows a target reference, @p target, with initial feedfoward gain, @p 
-     * d, and feedback correction.
+     * d, and feedback correction of type PI.
      * Values for the actual dimming and illuminance are returned for data
      * collection purposes.
      * If the TIMING macro is defined, the time elapsed until actuation is 

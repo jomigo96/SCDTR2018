@@ -1,0 +1,17 @@
+\begin{tikzpicture}[graphs/every graph/.style={edges={rounded corners,thick}}]
+	\tikzstyle{block} = [rectangle,thick,rounded corners=5pt,draw,minimum height = 8mm, minimum width = 20mm,inner sep = 4pt];
+	\tikzstyle{sum} = [circle,thick,draw,inner sep=2pt,align=center];
+	\tikzstyle{skip loop} = [to path={-- ++(0,#1) -| (\tikztotarget)}]
+	\matrix[row sep = 5mm, column sep = 7mm]{
+		\node (xin) {$L_{ref}$}; & \coordinate (x1); & \node (controller1) [block] {$C_{ff}\left(L_{ref}\right)$}; & & \node (dist) {$w$}; & & \node (noise) {$n$}; & & \\
+		& \node (ydes) [block] {simulator}; & & \node (sum1) [sum] {$+$}; & \node (system) [block] {$f(x,u) + w$}; & \node (sensor) [block] {$h(x,u)$}; & \node (sum2) [sum] {$+$}; & \coordinate (y_fb);	& \node (yout) {$\Tilde{L}$}; \\
+		& \node (sumy) [sum] {$-$}; & \node (controller2) [block] {$C_{fb}\left(L_{des}\right)$}; & & & & & & \\
+	};
+	\graph [use existing nodes,edges=-{Stealth[]}]{
+		xin -> controller1 -> sum1 -> [edge node={node[auto]{$u$}}] system -> [edge node={node[auto]{$L$}}] sensor -> sum2 -> yout;
+		x1 -> ydes -> [edge node={node[auto]{$L_{des}$}}] sumy -> controller2 -> sum1;
+		dist -> system;
+		noise -> sum2;
+		y_fb ->[skip loop = -23mm] sumy;
+	};
+\end{tikzpicture}
