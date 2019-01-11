@@ -120,10 +120,11 @@ public:
         float v, ff, R, value, Ltarget;
         float error;
         const float epsilon = 0.7;
-        const float KP=0.05;
-        const float KI=0.00001;
+        const float KP=30;
+        const float KI=0.0001;
         const float h=0.005;
 
+        char str[32];
         
 #ifdef TIMING
         long t1, t2;
@@ -161,21 +162,24 @@ public:
         //Feed-back
         error = deadzone(Ltarget - *L, epsilon);
         integral = integral + h/2.0*(error + error_keep);
-        u += (integral*KI + error)*KP;
+        u += h*(integral*KI + error)*KP;
 
         //Actuation
         value = round(ff+u);
         analogWrite(led_pin, saturation(value));
+       
 
 #ifdef TIMING
         t2 = micros();
-        Serial.print("PID time taken (micros): ");
+        //Serial.print("PID time taken (micros): ");
         Serial.println(t2-t1);
 #endif
 
         //Clean-up
 #ifndef SUPRESS_LUX
-        Serial.println(*L);
+        //sprintf(str, "%ld,%d", micros(), (int)(*L*100));
+        Serial.println(*L-Ltarget);
+
 #endif
         t += h;
         

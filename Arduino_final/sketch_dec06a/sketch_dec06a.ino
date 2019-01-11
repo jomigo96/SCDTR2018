@@ -7,9 +7,9 @@
  *
  * */
 
-#define NODE1
+#define NODE2
 #define DEBUG
-#define SUPRESS_LUX
+//#define SUPRESS_LUX
 //#define DEBUG_MSG
 //#define TIMING
 //#define DEBUG_CONSENSUS
@@ -45,8 +45,8 @@ byte message_received = false;
 
 // LDR 
 const int sensor_pin = 0;
-const int lux_high = 250;
-const int lux_low = 120;
+const int lux_high = 150;
+const int lux_low = 80;
 
 // Initialize controllers, defining costs
 #ifdef NODE1
@@ -93,6 +93,7 @@ void switch_isr(){
     Serial.print("Lower bound set to: ");
     Serial.println(lower_bound);
 #endif
+    target = lower_bound;
 }
 
 /*****************************************************************************/
@@ -103,6 +104,9 @@ void setup() {
     // Set Timer1 to raise an interruption with frequency of 200Hz
 
     cli(); // disable interrupts
+
+    //pwm of pin 3
+    TCCR2B = TCCR2B & B11111000 | B00000011; // for PWM frequency of 980.39 Hz
 
     // Clear registers
     TCCR1A = 0; // Operating mode - CTC
@@ -119,9 +123,9 @@ void setup() {
     sei(); // enable interrupts
 
     // I2C
-    Wire.begin(own_address);
-    Wire.onReceive(receiveEvent); 
-    TWAR |= 1; //Enable reception of broadcasts
+    //Wire.begin(own_address);
+    //Wire.onReceive(receiveEvent); 
+    //TWAR |= 1; //Enable reception of broadcasts
 
     // Occupation toggle button
     pinMode(pin_switch, INPUT_PULLUP);
@@ -138,15 +142,21 @@ void setup() {
 #endif //NODE1
 #endif //DEBUG
 
-    run_calibration(0); // Start calibration as master
-
+    //run_calibration(0); // Start calibration as master
+	// manual callibration
+    analogWrite(led_pin, 150);
+    delay(2000);
+    L = analogRead(led_pin);
+    L = controller.compute_lux(L);
+    K11 = L/(150.0/255.0);
+    //K11 = (206.0/255.0)/150.0;
 }
 
 /*****************************************************************************/
 // Main loop
 
 void loop() {
-
+/*
     if(message_received){ // Handle incoming message
         message_received = false;
 
@@ -231,15 +241,18 @@ void loop() {
         controller.get_dimmings(&d1, &d2);
         send_consensus_iteration_data(consensus_new, d1, d2, own_address);
     }
-
+*/
+    long t;
     // Controller action, signaled by timer ISR
     if(isr_flag){
         isr_flag=0;
 
-        controller.PID_control(target, d_sol/100.0, &dimming, &L);
+        controller.PID_control(target, target/K11, &dimming, &L);
 
         // Send message for data collection
-        send_sample_time_data(own_address, dimming, lower_bound,L, target, c1);
+ //       send_sample_time_data(own_address, dimming, lower_bound,L, target, c1);
         debouncer++; // Button debouncing
     }
+
+   
 }
