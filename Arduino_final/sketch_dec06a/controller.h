@@ -120,8 +120,8 @@ public:
         float v, ff, R, value, Ltarget;
         float error;
         const float epsilon = 0.7;
-        const float KP=0.05;
-        const float KI=0.00001;
+        const float KP=30;
+        const float KI=0.0001;
         const float h=0.005;
 
         
@@ -161,7 +161,7 @@ public:
         //Feed-back
         error = deadzone(Ltarget - *L, epsilon);
         integral = integral + h/2.0*(error + error_keep);
-        u += (integral*KI + error)*KP;
+        u += (integral*KI + error)*KP*h;
 
         //Actuation
         value = round(ff+u);
