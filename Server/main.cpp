@@ -82,7 +82,8 @@ void data_manager_thread(){
     const float h = 0.005;
     uint32_t timestamp; // UNIX timestamp
 
-    ready = false;
+    ready[0] = false;
+    ready[1] = false;
 
     if(gpioInitialise() < 0){
         std::cerr << "Error initializing gpio" << std::endl;
