@@ -35,4 +35,4 @@
 
 + Time spent in serial comms is on average 384 microseconds, for 6 bytes, the value in LUX.
 + Jitter: mean of 5ms and variance of 0.3248 microseconds squared
-## Niquist critical point: Kp = 600, oscilation frequency: 20Hz
++ Niquist critical point: Kp = 600, oscilation frequency: 20Hz
