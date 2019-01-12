@@ -1,794 +1,260 @@
-Received: s l 2 120.773 43066
-Received: s l 2 120.773 43071
-Received: s l 2 120.359 43076
-Received: s l 2 120.773 43081
-Received: s l 2 120.359 43086
-Received: s l 2 120.359 43091
-Received: s l 2 120.359 43096
-Received: s l 2 120.359 43101
-Received: s l 2 120.359 43106
-Received: s l 2 120.773 43111
-Received: s l 2 120.773 43116
-Received: s l 2 121.188 43121
-Received: s l 2 120.773 43126
-Received: s l 2 120.773 43131
-Received: s l 2 120.773 43136
-Received: s l 2 121.188 43141
-Received: s l 2 121.188 43146
-Received: s l 2 121.188 43151
-Received: s l 2 120.773 43156
-Received: s l 2 120.773 43161
-Received: s l 2 120.359 43166
-Received: s l 2 120.359 43171
-Received: s l 2 120.359 43176
-Received: s l 2 119.945 43181
-Received: s l 2 120.359 43186
-Received: s l 2 119.945 43191
-Received: s l 2 120.359 43197
-Received: s l 2 120.773 43201
-Received: s l 2 120.773 43206
-Received: s l 2 120.773 43211
-Received: s l 2 120.773 43216
-Received: s l 2 120.773 43221
-Received: s l 2 120.773 43226
-Received: s l 2 120.359 43231
-Received: s l 2 120.773 43237
-Received: s l 2 120.773 43241
-Received: s l 2 120.773 43246
-Received: s l 2 120.773 43252
-Received: s l 2 120.773 43256
-Received: s l 2 120.773 43261
-Received: s l 2 120.773 43266
-Received: s l 2 120.359 43271
-Received: s l 2 120.359 43277
-Received: s l 2 120.773 43281
-Received: s l 2 120.773 43286
-Received: s l 2 120.359 43292
-Received: s l 2 120.359 43296
-Received: s l 2 120.359 43301
-Received: s l 2 120.359 43306
-Received: s l 2 120.359 43311
-Received: s l 2 120.359 43317
-Received: s l 2 120.359 43321
-Received: s l 2 120.359 43326
-Received: s l 2 120.773 43331
-Received: s l 2 120.359 43336
-Received: s l 2 120.359 43342
-Received: s l 2 119.945 43346
-Received: s l 2 120.359 43351
-Received: s l 2 120.359 43357
-Received: s l 2 120.359 43361
-Received: s l 2 120.359 43366
-Received: s l 2 120.359 43372
-Received: s l 2 120.359 43376
-Received: s l 2 120.773 43381
-Received: s l 2 120.773 43387
-Received: s l 2 120.773 43391
-Received: s l 2 120.773 43397
-Received: s l 2 121.188 43401
-Received: s l 2 121.188 43406
-Received: s l 2 121.188 43412
-Received: s l 2 120.773 43416
-Received: s l 2 121.188 43421
-Received: s l 2 120.359 43427
-Received: s l 2 120.359 43431
-Received: s l 2 120.359 43437
-Received: s l 2 120.359 43442
-Received: s l 2 120.359 43446
-Received: s l 2 120.359 43452
-Received: s l 2 120.773 43456
-Received: s l 2 120.773 43461
-Received: s l 2 121.188 43467
-Received: s l 2 121.188 43471
-Received: s l 2 121.188 43477
-Received: s l 2 120.773 43482
-Received: s l 2 121.188 43486
-Received: s l 2 120.773 43492
-Received: s l 2 119.945 43497
-Received: s l 2 119.945 43501
-Received: s l 2 119.945 43507
-Received: s l 2 120.359 43511
-Received: s l 2 120.359 43517
-Received: s l 2 120.359 43522
-Received: s l 2 120.773 43526
-Received: s l 2 120.773 43532
-Received: s l 2 121.188 43537
-Received: s l 2 121.188 43541
-Received: s l 2 120.773 43547
-Received: s l 2 121.188 43551
-Received: s l 2 121.188 43557
-Received: s l 2 121.188 43562
-Received: s l 2 120.773 43566
-Received: s l 2 121.188 43572
-Received: s l 2 120.773 43577
-Received: s l 2 120.773 43581
-Received: s l 2 120.773 43587
-Received: s l 2 120.359 43592
-Received: s l 2 119.945 43597
-Received: s l 2 120.359 43602
-Received: s l 2 119.945 43606
-Received: s l 2 119.945 43612
-Received: s l 2 120.773 43617
-Received: s l 2 120.773 43621
-Received: s l 2 120.773 43627
-Received: s l 2 120.773 43632
-Received: s l 2 120.773 43636
-Received: s l 2 121.188 43642
-Received: s l 2 120.773 43647
-Received: s l 2 120.773 43652
-Received: s l 2 120.773 43657
-Received: s l 2 121.188 43661
-Received: s l 2 120.773 43667
-Received: s l 2 121.188 43671
-Received: s l 2 120.773 43677
-Received: s l 2 120.359 43682
-Received: s l 2 120.773 43686
-Received: s l 2 120.359 43692
-Received: s l 2 120.359 43697
-Received: s l 2 119.945 43702
-Received: s l 2 120.359 43707
-Received: s l 2 120.773 43712
-Received: s l 2 120.773 43717
-Received: s l 2 121.188 43722
-Received: s l 2 120.773 43727
-Received: s l 2 120.773 43732
-Received: s l 2 121.188 43737
-Received: s l 2 121.188 43741
-Received: s l 2 120.773 43747
-Received: s l 2 120.773 43752
-Received: s l 2 120.773 43757
-Received: s l 2 120.773 43762
-Received: s l 2 120.359 43767
-Received: s l 2 120.359 43772
-Received: s l 2 120.359 43777
-Received: s l 2 120.359 43781
-Received: s l 2 120.773 43787
-Received: s l 2 121.188 43792
-Received: s l 2 120.773 43797
-Received: s l 2 120.773 43802
-Received: s l 2 120.773 43807
-Received: s l 2 120.773 43812
-Received: s l 2 120.359 43817
-Received: s l 2 120.773 43822
-Received: s l 2 120.359 43827
-Received: s l 2 120.773 43832
-Received: s l 2 120.773 43837
-Received: s l 2 120.773 43842
-Received: s l 2 121.188 43847
-Received: s l 2 120.773 43852
-Received: s l 2 120.773 43857
-Received: s l 2 120.773 43862
-Received: s l 2 120.359 43867
-Received: s l 2 120.773 43872
-Received: s l 2 120.359 43877
-Received: s l 2 120.359 43882
-Received: s l 2 120.359 43887
-Received: s l 2 120.773 43892
-Received: s l 2 120.773 43897
-Received: s l 2 120.773 43902
-Received: s l 2 120.773 43907
-Received: s l 2 120.773 43912
-Received: s l 2 121.188 43917
-Received: s l 2 121.188 43922
-Received: s l 2 120.773 43927
-Received: s l 2 120.773 43932
-Received: s l 2 120.773 43937
-Received: s l 2 120.773 43942
-Received: s l 2 120.359 43947
-Received: s l 2 120.773 43952
-Received: s l 2 120.359 43957
-Received: s l 2 120.359 43962
-Received: s l 2 120.359 43967
-Received: s l 2 120.359 43972
-Received: s l 2 120.359 43977
-Received: s l 2 120.773 43982
-Received: s l 2 120.773 43987
-Received: s l 2 120.773 43992
-Received: s l 2 121.188 43997
-Received: s l 2 121.604 44002
-Received: s l 2 121.188 44007
-Received: s l 2 120.773 44012
-Received: s l 2 120.773 44017
-Received: s l 2 120.359 44022
-Received: s l 2 120.359 44027
-Received: s l 2 120.359 44032
-Received: s l 2 120.773 44037
-Received: s l 2 120.359 44042
-Received: s l 2 120.359 44047
-Received: s l 2 120.359 44052
-Received: s l 2 120.773 44057
-Received: s l 2 120.773 44062
-Received: s l 2 120.773 44067
-Received: s l 2 120.773 44072
-Received: s l 2 121.188 44077
-Received: s l 2 121.188 44082
-Received: s l 2 120.773 44087
-Received: s l 2 120.359 44092
-Received: s l 2 120.773 44097
-Received: s l 2 120.359 44102
-Received: s l 2 120.359 44107
-Received: s l 2 119.945 44112
-Received: s l 2 120.359 44117
-Received: s l 2 121.188 44122
-Received: s l 2 120.773 44127
-Received: s l 2 120.773 44132
-Received: s l 2 121.188 44137
-Received: s l 2 121.604 44142
-Received: s l 2 121.188 44147
-Received: s l 2 121.188 44152
-Received: s l 2 120.773 44157
-Received: s l 2 120.773 44162
-Received: s l 2 120.773 44167
-Received: s l 2 120.773 44172
-Received: s l 2 120.359 44177
-Received: s l 2 120.359 44182
-Received: s l 2 120.773 44187
-Received: s l 2 120.359 44192
-Received: s l 2 120.359 44197
-Received: s l 2 120.359 44202
-Received: s l 2 120.359 44207
-Received: s l 2 120.359 44212
-Received: s l 2 120.773 44217
-Received: s l 2 120.359 44222
-Received: s l 2 121.188 44227
-Received: s l 2 121.188 44232
-Received: s l 2 121.188 44237
-Received: s l 2 121.188 44242
-Received: s l 2 120.359 44247
-Received: s l 2 120.359 44252
-Received: s l 2 120.773 44257
-Received: s l 2 120.359 44262
-Received: s l 2 120.359 44267
-Received: s l 2 120.359 44272
-Received: s l 2 120.773 44277
-Received: s l 2 120.773 44282
-Received: s l 2 121.188 44287
-Received: s l 2 120.773 44292
-Received: s l 2 120.773 44297
-Received: s l 2 120.773 44302
-Received: s l 2 120.773 44307
-Received: s l 2 120.359 44312
-Received: s l 2 120.359 44317
-Received: s l 2 120.773 44322
-Received: s l 2 120.359 44327
-Received: s l 2 120.773 44332
-Received: s l 2 120.773 44337
-Received: s l 2 121.188 44342
-Received: s l 2 120.773 44347
-Received: s l 2 120.773 44352
-Received: s l 2 120.773 44357
-Received: s l 2 120.773 44362
-Received: s l 2 120.359 44367
-Received: s l 2 120.359 44372
-Received: s l 2 120.773 44377
-Received: s l 2 120.359 44382
-Received: s l 2 120.773 44387
-Received: s l 2 120.773 44392
-Received: s l 2 120.773 44397
-Received: s l 2 121.188 44402
-Received: s l 2 120.773 44407
-Received: s l 2 120.773 44412
-Received: s l 2 120.773 44417
-Received: s l 2 120.773 44422
-Received: s l 2 120.773 44427
-Received: s l 2 120.773 44432
-Received: s l 2 120.359 44437
-Received: s l 2 120.773 44442
-Received: s l 2 120.359 44447
-Received: s l 2 120.359 44452
-Received: s l 2 120.359 44457
-Received: s l 2 120.359 44462
-Received: s l 2 120.773 44467
-Received: s l 2 121.188 44474
-Received: s l 2 121.188 44477
-Received: s l 2 127.887 44482
-Received: s l 2 146.091 44487
-Received: s l 2 162.573 44492
-Received: s l 2 176.078 44497
-Received: s l 2 186.665 44502
-Received: s l 2 193.439 44507
-Received: s l 2 198.773 44512
-Received: s l 2 202.573 44517
-Received: s l 2 205.877 44522
-Received: s l 2 208.104 44527
-Received: s l 2 210.35 44532
-Received: s l 2 213.186 44537
-Received: s l 2 215.479 44542
-Received: s l 2 219.543 44547
-Received: s l 2 221.895 44552
-Received: s l 2 223.674 44557
-Received: s l 2 226.667 44562
-Received: s l 2 228.481 44567
-Received: s l 2 229.697 44572
-Received: s l 2 231.534 44577
-Received: s l 2 233.383 44587
-Received: s l 2 237.755 44597
-Received: s l 2 240.926 44612
-Received: s l 2 242.848 44622
-Received: s l 2 250.693 44814
-Received: s l 2 251.358 44819
-Received: s l 2 250.693 44834
-Received: s l 2 250.03 44839
-Received: s l 2 249.368 44849
-Received: s l 2 250.693 44854
-Received: s l 2 250.693 44859
-Received: s l 2 251.358 44864
-Received: s l 2 251.358 44869
-Received: s l 2 251.358 44874
-Received: s l 2 250.693 44879
-Received: s l 2 251.358 44884
-Received: s l 2 250.693 44889
-Received: s l 2 250.03 44894
-Received: s l 2 250.03 44899
-Received: s l 2 251.358 44904
-Received: s l 2 251.358 44909
-Received: s l 2 250.693 44914
-Received: s l 2 251.358 44919
-Received: s l 2 251.358 44924
-Received: s l 2 251.358 44929
-Received: s l 2 251.358 44934
-Received: s l 2 250.693 44939
-Received: s l 2 249.368 44944
-Received: s l 2 249.368 44949
-Received: s l 2 250.693 44954
-Received: s l 2 251.358 44959
-Received: s l 2 251.358 44964
-Received: s l 2 251.358 44969
-Received: s l 2 251.358 44974
-Received: s l 2 251.358 44979
-Received: s l 2 251.358 44984
-Received: s l 2 250.693 44989
-Received: s l 2 249.368 44994
-Received: s l 2 250.693 44999
-Received: s l 2 250.693 45004
-Received: s l 2 250.693 45009
-Received: s l 2 250.693 45014
-Received: s l 2 250.693 45019
-Received: s l 2 251.358 45024
-Received: s l 2 250.693 45029
-Received: s l 2 250.693 45034
-Received: s l 2 250.693 45039
-Received: s l 2 250.693 45044
-Received: s l 2 250.03 45049
-Received: s l 2 251.358 45054
-Received: s l 2 250.693 45059
-Received: s l 2 250.693 45064
-Received: s l 2 250.693 45069
-Received: s l 2 250.693 45074
-Received: s l 2 251.358 45079
-Received: s l 2 251.358 45084
-Received: s l 2 250.693 45089
-Received: s l 2 250.03 45094
-Received: s l 2 250.03 45099
-Received: s l 2 249.368 45104
-Received: s l 2 250.693 45109
-Received: s l 2 251.358 45114
-Received: s l 2 251.358 45119
-Received: s l 2 251.358 45124
-Received: s l 2 251.358 45129
-Received: s l 2 251.358 45134
-Received: s l 2 250.693 45139
-Received: s l 2 250.693 45144
-Received: s l 2 250.03 45149
-Received: s l 2 250.03 45154
-Received: s l 2 250.693 45159
-Received: s l 2 251.358 45164
-Received: s l 2 250.693 45169
-Received: s l 2 250.693 45174
-Received: s l 2 250.693 45179
-Received: s l 2 251.358 45184
-Received: s l 2 250.693 45189
-Received: s l 2 250.693 45194
-Received: s l 2 249.368 45199
-Received: s l 2 249.368 45204
-Received: s l 2 251.358 45209
-Received: s l 2 251.358 45214
-Received: s l 2 250.693 45219
-Received: s l 2 250.693 45224
-Received: s l 2 250.693 45229
-Received: s l 2 250.693 45234
-Received: s l 2 250.693 45239
-Received: s l 2 251.358 45244
-Received: s l 2 249.368 45249
-Received: s l 2 250.03 45254
-Received: s l 2 250.693 45259
-Received: s l 2 251.358 45264
-Received: s l 2 251.358 45269
-Received: s l 2 251.358 45274
-Received: s l 2 250.693 45279
-Received: s l 2 251.358 45284
-Received: s l 2 250.693 45289
-Received: s l 2 250.693 45294
-Received: s l 2 250.03 45299
-Received: s l 2 250.693 45304
-Received: s l 2 252.025 45309
-Received: s l 2 251.358 45314
-Received: s l 2 251.358 45319
-Received: s l 2 251.358 45324
-Received: s l 2 250.693 45329
-Received: s l 2 250.693 45334
-Received: s l 2 250.693 45339
-Received: s l 2 250.693 45344
-Received: s l 2 250.693 45349
-Received: s l 2 250.693 45354
-Received: s l 2 250.03 45359
-Received: s l 2 251.358 45364
-Received: s l 2 251.358 45369
-Received: s l 2 250.693 45374
-Received: s l 2 250.693 45379
-Received: s l 2 251.358 45384
-Received: s l 2 250.693 45389
-Received: s l 2 250.693 45394
-Received: s l 2 250.693 45399
-Received: s l 2 250.693 45404
-Received: s l 2 249.368 45409
-Received: s l 2 251.358 45414
-Received: s l 2 251.358 45419
-Received: s l 2 250.693 45424
-Received: s l 2 250.693 45429
-Received: s l 2 250.693 45434
-Received: s l 2 251.358 45439
-Received: s l 2 250.693 45444
-Received: s l 2 250.03 45449
-Received: s l 2 249.368 45454
-Received: s l 2 249.368 45459
-Received: s l 2 250.693 45464
-Received: s l 2 251.358 45469
-Received: s l 2 250.693 45474
-Received: s l 2 251.358 45479
-Received: s l 2 251.358 45484
-Received: s l 2 250.693 45489
-Received: s l 2 251.358 45494
-Received: s l 2 250.693 45499
-Received: s l 2 250.03 45504
-Received: s l 2 250.693 45509
-Received: s l 2 251.358 45514
-Received: s l 2 251.358 45519
-Received: s l 2 250.693 45524
-Received: s l 2 250.693 45529
-Received: s l 2 250.693 45534
-Received: s l 2 251.358 45539
-Received: s l 2 250.03 45544
-Received: s l 2 250.03 45549
-Received: s l 2 250.03 45554
-Received: s l 2 250.03 45559
-Received: s l 2 251.358 45564
-Received: s l 2 250.693 45569
-Received: s l 2 250.693 45574
-Received: s l 2 251.358 45579
-Received: s l 2 250.693 45584
-Received: s l 2 251.358 45589
-Received: s l 2 250.693 45594
-Received: s l 2 250.693 45599
-Received: s l 2 250.693 45604
-Received: s l 2 250.693 45609
-Received: s l 2 250.03 45614
-Received: s l 2 251.358 45619
-Received: s l 2 251.358 45624
-Received: s l 2 250.693 45629
-Received: s l 2 250.693 45634
-Received: s l 2 250.693 45639
-Received: s l 2 251.358 45644
-Received: s l 2 250.693 45649
-Received: s l 2 250.03 45654
-Received: s l 2 249.368 45659
-Received: s l 2 249.368 45664
-Received: s l 2 250.693 45669
-Received: s l 2 250.693 45674
-Received: s l 2 251.358 45679
-Received: s l 2 250.693 45684
-Received: s l 2 250.693 45689
-Received: s l 2 250.693 45694
-Received: s l 2 250.693 45699
-Received: s l 2 250.693 45704
-Received: s l 2 250.693 45709
-Received: s l 2 250.03 45714
-Received: s l 2 251.358 45719
-Received: s l 2 251.358 45724
-Received: s l 2 250.693 45729
-Received: s l 2 250.693 45734
-Received: s l 2 251.358 45739
-Received: s l 2 251.358 45744
-Received: s l 2 250.693 45749
-Received: s l 2 250.693 45754
-Received: s l 2 249.368 45759
-Received: s l 2 250.03 45764
-Received: s l 2 251.358 45769
-Received: s l 2 250.693 45774
-Received: s l 2 250.693 45779
-Received: s l 2 250.693 45784
-Received: s l 2 250.693 45789
-Received: s l 2 250.693 45794
-Received: s l 2 250.693 45799
-Received: s l 2 250.693 45804
-Received: s l 2 250.03 45809
-Received: s l 2 250.693 45814
-Received: s l 2 251.358 45819
-Received: s l 2 251.358 45824
-Received: s l 2 251.358 45829
-Received: s l 2 250.693 45834
-Received: s l 2 250.693 45839
-Received: s l 2 250.693 45844
-Received: s l 2 250.03 45849
-Received: s l 2 250.693 45854
-Received: s l 2 250.693 45859
-Received: s l 2 250.03 45864
-Received: s l 2 249.368 45869
-Received: s l 2 250.693 45874
-Received: s l 2 250.693 45879
-Received: s l 2 251.358 45884
-Received: s l 2 250.693 45889
-Received: s l 2 250.693 45894
-Received: s l 2 250.693 45899
-Received: s l 2 250.693 45904
-Received: s l 2 250.03 45909
-Received: s l 2 249.368 45914
-Received: s l 2 249.368 45919
-Received: s l 2 251.358 45924
-Received: s l 2 251.358 45929
-Received: s l 2 251.358 45934
-Received: s l 2 250.693 45939
-Received: s l 2 251.358 45944
-Received: s l 2 251.358 45949
-Received: s l 2 250.03 45954
-Received: s l 2 251.358 45959
-Received: s l 2 248.708 45964
-Received: s l 2 249.368 45969
-Received: s l 2 250.693 45974
-Received: s l 2 250.693 45979
-Received: s l 2 251.358 45984
-Received: s l 2 250.693 45989
-Received: s l 2 251.358 45994
-Received: s l 2 250.693 45999
-Received: s l 2 251.358 46004
-Received: s l 2 250.03 46009
-Received: s l 2 250.03 46014
-Received: s l 2 250.03 46019
-Received: s l 2 250.693 46024
-Received: s l 2 251.358 46029
-Received: s l 2 250.693 46034
-Received: s l 2 250.693 46039
-Received: s l 2 250.693 46044
-Received: s l 2 250.693 46049
-Received: s l 2 250.693 46054
-Received: s l 2 250.03 46059
-Received: s l 2 250.03 46064
-Received: s l 2 250.03 46069
-Received: s l 2 251.358 46074
-Received: s l 2 251.358 46079
-Received: s l 2 251.358 46084
-Received: s l 2 250.693 46089
-Received: s l 2 251.358 46094
-Received: s l 2 250.693 46099
-Received: s l 2 250.693 46104
-Received: s l 2 250.693 46109
-Received: s l 2 250.03 46114
-Received: s l 2 250.693 46119
-Received: s l 2 250.03 46124
-Received: s l 2 250.693 46129
-Received: s l 2 251.358 46134
-Received: s l 2 251.358 46139
-Received: s l 2 250.693 46144
-Received: s l 2 250.693 46149
-Received: s l 2 250.693 46154
-Received: s l 2 250.693 46159
-Received: s l 2 250.03 46164
-Received: s l 2 249.368 46169
-Received: s l 2 248.708 46174
-Received: s l 2 250.693 46179
-Received: s l 2 251.358 46184
-Received: s l 2 251.358 46189
-Received: s l 2 251.358 46194
-Received: s l 2 250.693 46199
-Received: s l 2 251.358 46204
-Received: s l 2 250.03 46209
-Received: s l 2 250.693 46214
-Received: s l 2 249.368 46219
-Received: s l 2 250.03 46224
-Received: s l 2 250.693 46229
-Received: s l 2 251.358 46234
-Received: s l 2 251.358 46239
-Received: s l 2 250.693 46244
-Received: s l 2 250.693 46249
-Received: s l 2 250.693 46254
-Received: s l 2 250.693 46259
-Received: s l 2 250.03 46264
-Received: s l 2 248.708 46269
-Received: s l 2 250.03 46274
-Received: s l 2 250.693 46279
-Received: s l 2 250.693 46284
-Received: s l 2 250.693 46289
-Received: s l 2 250.693 46294
-Received: s l 2 250.693 46299
-Received: s l 2 250.693 46304
-Received: s l 2 250.03 46309
-Received: s l 2 250.693 46314
-Received: s l 2 250.693 46319
-Received: s l 2 250.03 46324
-Received: s l 2 251.358 46329
-Received: s l 2 251.358 46334
-Received: s l 2 251.358 46339
-Received: s l 2 252.025 46344
-Received: s l 2 250.693 46349
-Received: s l 2 250.693 46354
-Received: s l 2 250.693 46359
-Received: s l 2 250.693 46364
-Received: s l 2 250.03 46369
-Received: s l 2 250.03 46374
-Received: s l 2 250.03 46379
-Received: s l 2 251.358 46384
-Received: s l 2 251.358 46389
-Received: s l 2 251.358 46394
-Received: s l 2 250.693 46399
-Received: s l 2 250.693 46404
-Received: s l 2 250.693 46409
-Received: s l 2 250.03 46414
-Received: s l 2 250.693 46419
-Received: s l 2 249.368 46424
-Received: s l 2 250.03 46429
-Received: s l 2 251.358 46434
-Received: s l 2 250.693 46439
-Received: s l 2 250.693 46444
-Received: s l 2 251.358 46449
-Received: s l 2 250.693 46454
-Received: s l 2 251.358 46459
-Received: s l 2 250.693 46464
-Received: s l 2 250.03 46469
-Received: s l 2 250.03 46474
-Received: s l 2 249.368 46479
-Received: s l 2 251.358 46484
-Received: s l 2 251.358 46489
-Received: s l 2 251.358 46494
-Received: s l 2 251.358 46499
-Received: s l 2 250.693 46504
-Received: s l 2 250.693 46509
-Received: s l 2 250.03 46514
-Received: s l 2 250.03 46519
-Received: s l 2 249.368 46524
-Received: s l 2 249.368 46529
-Received: s l 2 251.358 46534
-Received: s l 2 251.358 46539
-Received: s l 2 251.358 46544
-Received: s l 2 251.358 46549
-Received: s l 2 251.358 46554
-Received: s l 2 251.358 46559
-Received: s l 2 251.358 46564
-Received: s l 2 250.693 46569
-Received: s l 2 250.693 46574
-Received: s l 2 250.693 46579
-Received: s l 2 250.693 46584
-Received: s l 2 251.358 46589
-Received: s l 2 251.358 46594
-Received: s l 2 251.358 46599
-Received: s l 2 251.358 46604
-Received: s l 2 251.358 46609
-Received: s l 2 251.358 46614
-Received: s l 2 250.693 46619
-Received: s l 2 250.03 46624
-Received: s l 2 250.693 46629
-Received: s l 2 249.368 46634
-Received: s l 2 251.358 46639
-Received: s l 2 251.358 46644
-Received: s l 2 251.358 46649
-Received: s l 2 251.358 46654
-Received: s l 2 250.693 46659
-Received: s l 2 250.693 46664
-Received: s l 2 250.693 46669
-Received: s l 2 250.03 46674
-Received: s l 2 250.03 46679
-Received: s l 2 250.03 46684
-Received: s l 2 251.358 46689
-Received: s l 2 251.358 46694
-Received: s l 2 251.358 46699
-Received: s l 2 251.358 46704
-Received: s l 2 250.693 46709
-Received: s l 2 250.693 46714
-Received: s l 2 250.03 46719
-Received: s l 2 250.03 46724
-Received: s l 2 249.368 46729
-Received: s l 2 249.368 46734
-Received: s l 2 250.693 46739
-Received: s l 2 251.358 46744
-Received: s l 2 251.358 46749
-Received: s l 2 251.358 46754
-Received: s l 2 251.358 46759
-Received: s l 2 251.358 46764
-Received: s l 2 251.358 46769
-Received: s l 2 250.693 46774
-Received: s l 2 249.368 46779
-Received: s l 2 250.03 46784
-Received: s l 2 250.693 46789
-Received: s l 2 252.025 46794
-Received: s l 2 251.358 46799
-Received: s l 2 251.358 46804
-Received: s l 2 251.358 46809
-Received: s l 2 251.358 46814
-Received: s l 2 250.693 46819
-Received: s l 2 250.693 46824
-Received: s l 2 250.693 46829
-Received: s l 2 250.03 46834
-Received: s l 2 250.693 46839
-Received: s l 2 251.358 46844
-Received: s l 2 251.358 46849
-Received: s l 2 250.693 46854
-Received: s l 2 250.693 46859
-Received: s l 2 251.358 46864
-Received: s l 2 250.693 46869
-Received: s l 2 250.693 46874
-Received: s l 2 250.03 46879
-Received: s l 2 250.03 46884
-Received: s l 2 249.368 46889
-Received: s l 2 250.693 46894
-Received: s l 2 251.358 46899
-Received: s l 2 251.358 46904
-Received: s l 2 251.358 46909
-Received: s l 2 251.358 46914
-Received: s l 2 250.693 46919
-Received: s l 2 251.358 46924
-Received: s l 2 250.03 46929
-Received: s l 2 249.368 46934
-Received: s l 2 250.03 46939
-Received: s l 2 250.693 46944
-Received: s l 2 250.693 46949
-Received: s l 2 250.693 46954
-Received: s l 2 250.693 46959
-Received: s l 2 250.693 46964
-Received: s l 2 251.358 46969
-Received: s l 2 250.693 46974
-Received: s l 2 250.03 46979
-Received: s l 2 249.368 46984
-Received: s l 2 248.708 46989
-Received: s l 2 251.358 46994
-Received: s l 2 250.693 46999
-Received: s l 2 251.358 47004
-Received: s l 2 250.693 47009
-Received: s l 2 250.693 47014
-Received: s l 2 250.693 47019
-Received: s l 2 250.693 47024
-Received: s l 2 250.03 47029
-Received: s l 2 248.708 47034
-Received: s l 2 250.03 47039
-Received: s l 2 251.358 47044
-Received: s l 2 251.358 47049
-Received: s l 2 251.358 47054
-Received: s l 2 250.693 47059
-Received: s l 2 251.358 47064
-Received: s l 2 250.693 47069
-Received: s l 2 250.693 47074
-Received: s l 2 250.693 47079
-Received: s l 2 250.693 47084
-Received: s l 2 250.693 47089
-Received: s l 2 251.358 47094
-Received: s l 2 250.693 47099
-Received: s l 2 251.358 47104
-Received: s l 2 250.693 47109
-Received: s l 2 251.358 47114
-Received: s l 2 251.358 47119
-Received: s l 2 250.693 47124
-Received: s l 2 250.693 47129
-sReceived: s l 2 250.03 47134
-Received: s l 2 250.693 47139
-Received: s l 2 250.03 47144
-Received: s l 2 250.693 47149
-Received: s l 2 250.693 47154
-Received: s l 2 251.358 47159
-Received: s l 2 250.693 47164
-Received: s l 2 250.693 47169
-Received: s l 2 252.025 47174
-Received: s l 2 250.693 47179
-Received: s l 2 250.03 47184
-Received: s l 2 249.368 47189
-Received: s l 2 248.708 47194
-Received: s l 2 250.693 47199
-Received: s l 2 251.358 47204
-Received: s l 2 250.693 47209
-Received: s l 2 251.358 47214
-Received: s l 2 250.693 47219
-Received: s l 2 250.693 47224
-Received: s l 2 250.693 47229
-Received: s l 2 250.693 47234
-Received: s l 2 249.368 47239
-Received: s l 2 249.368 47244
-Received: s l 2 250.693 47249
-Received: s l 2 250.693 47254
-Received: s l 2 250.693 47259
+44067,120.773
+44072,120.773
+44077,121.188
+44082,121.188
+44087,120.773
+44092,120.359
+44097,120.773
+44102,120.359
+44107,120.359
+44112,119.945
+44117,120.359
+44122,121.188
+44127,120.773
+44132,120.773
+44137,121.188
+44142,121.604
+44147,121.188
+44152,121.188
+44157,120.773
+44162,120.773
+44167,120.773
+44172,120.773
+44177,120.359
+44182,120.359
+44187,120.773
+44192,120.359
+44197,120.359
+44202,120.359
+44207,120.359
+44212,120.359
+44217,120.773
+44222,120.359
+44227,121.188
+44232,121.188
+44237,121.188
+44242,121.188
+44247,120.359
+44252,120.359
+44257,120.773
+44262,120.359
+44267,120.359
+44272,120.359
+44277,120.773
+44282,120.773
+44287,121.188
+44292,120.773
+44297,120.773
+44302,120.773
+44307,120.773
+44312,120.359
+44317,120.359
+44322,120.773
+44327,120.359
+44332,120.773
+44337,120.773
+44342,121.188
+44347,120.773
+44352,120.773
+44357,120.773
+44362,120.773
+44367,120.359
+44372,120.359
+44377,120.773
+44382,120.359
+44387,120.773
+44392,120.773
+44397,120.773
+44402,121.188
+44407,120.773
+44412,120.773
+44417,120.773
+44422,120.773
+44427,120.773
+44432,120.773
+44437,120.359
+44442,120.773
+44447,120.359
+44452,120.359
+44457,120.359
+44462,120.359
+44467,120.773
+44474,121.188
+44477,121.188
+44482,127.887
+44487,146.091
+44492,162.573
+44497,176.078
+44502,186.665
+44507,193.439
+44512,198.773
+44517,202.573
+44522,205.877
+44527,208.104
+4532,210.35 
+44537,213.186
+44542,215.479
+44547,219.543
+44552,221.895
+44557,223.674
+44562,226.667
+44567,228.481
+44572,229.697
+44577,231.534
+44587,233.383
+44597,237.755
+44612,240.926
+44622,242.848
+44814,250.693
+44819,251.358
+44834,250.693
+4839,250.03 
+44849,249.368
+44854,250.693
+44859,250.693
+44864,251.358
+44869,251.358
+44874,251.358
+44879,250.693
+44884,251.358
+44889,250.693
+4894,250.03 
+4899,250.03 
+44904,251.358
+44909,251.358
+44914,250.693
+44919,251.358
+44924,251.358
+44929,251.358
+44934,251.358
+44939,250.693
+44944,249.368
+44949,249.368
+44954,250.693
+44959,251.358
+44964,251.358
+44969,251.358
+44974,251.358
+44979,251.358
+44984,251.358
+44989,250.693
+44994,249.368
+44999,250.693
+45004,250.693
+45009,250.693
+45014,250.693
+45019,250.693
+45024,251.358
+45029,250.693
+45034,250.693
+45039,250.693
+45044,250.693
+5049,250.03 
+45054,251.358
+45059,250.693
+45064,250.693
+45069,250.693
+45074,250.693
+45079,251.358
+45084,251.358
+45089,250.693
+5094,250.03 
+5099,250.03 
+45104,249.368
+45109,250.693
+45114,251.358
+45119,251.358
+45124,251.358
+45129,251.358
+45134,251.358
+45139,250.693
+45144,250.693
+5149,250.03 
+5154,250.03 
+45159,250.693
+45164,251.358
+45169,250.693
+45174,250.693
+45179,250.693
+45184,251.358
+45189,250.693
+45194,250.693
+45199,249.368
+45204,249.368
+45209,251.358
+45214,251.358
+45219,250.693
+45224,250.693
+45229,250.693
+45234,250.693
+45239,250.693
+45244,251.358
+45249,249.368
+5254,250.03 
+45259,250.693
+45264,251.358
+45269,251.358
+45274,251.358
+45279,250.693
+45284,251.358
+45289,250.693
+45294,250.693
+5299,250.03 
+45304,250.693
+45309,252.025
+45314,251.358
+45319,251.358
+45324,251.358
+45329,250.693
+45334,250.693
+45339,250.693
+45344,250.693
+45349,250.693
+45354,250.693
+5359,250.03 
+45364,251.358
+45369,251.358
+45374,250.693
+45379,250.693
+45384,251.358
+45389,250.693
+45394,250.693
+45399,250.693
+45404,250.693
+45409,249.368
+45414,251.358
+45419,251.358
+45424,250.693
+45429,250.693
+45434,250.693
+45439,251.358
+45444,250.693
+5449,250.03 
+45454,249.368
+45459,249.368
+45464,250.693
+45469,251.358
+45474,250.693
+45479,251.358
+45484,251.358
+45489,250.693
+45494,251.358
+45499,250.693
+5504,250.03 
+45509,250.693
+45514,251.358
+45519,251.358
+45524,250.693
+45529,250.693
+45534,250.693
+45539,251.358
+5544,250.03 
+5549,250.03 
+5554,250.03 
+5559,250.03 
+45564,251.358
+45569,250.693
+45574,250.693
+45579,251.358
+45584,250.693
+45589,251.358
