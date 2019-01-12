@@ -30,7 +30,7 @@ using boost::asio::ip::tcp;
 
 extern std::mutex m;
 extern std::condition_variable cv;
-extern bool ready;
+extern bool ready[];
 extern desk_t desks[];
 extern std::pair< std::deque<std::pair<float, float>> , std::deque<std::pair<float, float> > > last_minute_buffer;
 

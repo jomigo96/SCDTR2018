@@ -37,7 +37,7 @@
 
 std::mutex m; //!< Mutex
 std::condition_variable cv; //!< For the streamming feature
-bool ready; //!< Prevent spurious wake-ups
+bool ready[2]; //!< Prevent spurious wake-ups
 const int desk_count = 2;
 desk_t desks[desk_count]; //!< Data structure to store last sample desk info
 std::pair< std::deque< std::pair<float, float > >,
@@ -158,7 +158,7 @@ void data_manager_thread(){
                     if(last_minute_buffer.second.size()>1200)
                         last_minute_buffer.second.pop_front();
                 }
-                ready=true;
+                ready[desk]=true;
                 cv.notify_all();
                 m.unlock();
             }else if(message.code == data){ //Cal finished, counts as a restart

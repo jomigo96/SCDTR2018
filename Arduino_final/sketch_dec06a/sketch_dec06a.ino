@@ -116,6 +116,8 @@ void setup() {
     TCCR1B |= (0<<CS12)|(1<<CS11)|(0<<CS10); // prescaler 8
     TIMSK1 |= (1<<OCIE1A); 
 
+    // Set PWM frequency to 980.39 Hz
+    TCCR2B = TCCR2B & B11111000 | B00000011;
     sei(); // enable interrupts
 
     // I2C

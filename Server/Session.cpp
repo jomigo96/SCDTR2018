@@ -153,12 +153,14 @@ void Session::start_streaming(std::shared_ptr<Session>& s, const boost::system::
         return;
     }
 
+	bool &node_flag = ready[stream_node];
+
     {//scope for the lock
         std::unique_lock<std::mutex> lck(m);
-        while(!ready){
+        while(!node_flag){
             cv.wait(lck);
         }
-        ready=false;
+        node_flag=false;
 
 
         uint32_t time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
