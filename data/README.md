@@ -14,3 +14,16 @@
 + Communication times (I2C)
 + Compare controllers (independant vs distributed)
 + Performance metrics
+
+
+
+
+# Performance metric data
+
+| Metric          | Independant   | Cooperative |
+| --------------- | -------------:| -----------:|
+| Total energy    | 8523.97       | 8490.16     |
+| Total power     | 864.45        | 851.65      |
+| Total confort   | 4.5378        | 2.6512      |
+| Total flicker   | 181.848       | 138.587     |
+

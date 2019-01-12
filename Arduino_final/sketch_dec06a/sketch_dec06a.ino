@@ -52,9 +52,9 @@ const int lux_low = 120;
 #ifdef NODE1
 Controller controller = Controller(5.8515, -0.9355, 10000, 1e-6);
 float K11=326.84, K22=411.81, K12=92.72, K21=109.37, o1=4.88, o2=6.82; 
-const float c1=1;
+const float c1=5;
 #else
-Controller controller = Controller(7.3250, -1.4760, 10000, 1e-6);
+Controller controller = Controller(7.5250, -1.4760, 10000, 1e-6);
 float K22=326.84, K11=411.81, K21=92.72, K12=109.37, o2=4.88, o1=6.82; 
 const float c1=1;
 #endif
@@ -233,6 +233,9 @@ void loop() {
         controller.get_dimmings(&d1, &d2);
         send_consensus_iteration_data(consensus_new, d1, d2, own_address);
     }
+
+
+    
 
     // Controller action, signaled by timer ISR
     if(isr_flag){
