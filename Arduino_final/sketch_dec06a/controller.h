@@ -169,8 +169,8 @@ public:
 
 #ifdef TIMING
         t2 = micros();
-        Serial.print("PID time taken (micros): ");
-        Serial.println(t2-t1);
+        //Serial.print("PID time taken (micros): ");
+        //Serial.println(t2-t1);
 #endif
 
         //Clean-up

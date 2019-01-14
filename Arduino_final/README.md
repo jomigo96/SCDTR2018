@@ -36,4 +36,7 @@ The LDR corresponding node 2 was loosely calibrated at home. The new values are:
 
 #define TIMING
 // Prints time taken in PID control, or message forwarding.
+
+#define DEBUG_CONSENSUS
+// Prints variables at every consensus iteration
 ```
